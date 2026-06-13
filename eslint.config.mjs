@@ -18,6 +18,13 @@ export default defineConfig([
   {
     rules: {
       'no-undef': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      'obsidianmd/ui/sentence-case': [
+        'warn',
+        {
+          brands: ['Keystone', 'Latex Suite'],
+        },
+      ],
     },
   },
 ]);

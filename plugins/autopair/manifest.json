@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-autopair",
+  "name": "Autopair",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Autopair anything!",
+  "author": "chip44",
+  "authorUrl": "https://github.com/chip44",
+  "isDesktopOnly": false
+}

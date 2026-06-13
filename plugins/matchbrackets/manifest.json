@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-matchbrackets",
+  "name": "Match Brackets",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Highlight matching brackets",
+  "author": "chip44",
+  "authorUrl": "https://github.com/chip44",
+  "isDesktopOnly": false
+}

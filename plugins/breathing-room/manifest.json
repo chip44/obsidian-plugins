@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-breathing-room",
+  "name": "Breathing Room",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Inline math needs space to breath...",
+  "author": "chip44",
+  "authorUrl": "https://github.com/chip44",
+  "isDesktopOnly": false
+}

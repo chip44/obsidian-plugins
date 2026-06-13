@@ -1,0 +1,21 @@
+diff --git a/dist/index.js b/dist/index.js
+index 73183bf69e2eebe9d0ac2c82a1d348537a0b6393..d9e025f014e92289cdabb758a61f0a22e679d980 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1955,6 +1955,7 @@ function handleClose(state, _open, close) {
+ // possibly triple quotes (as in `"""abc"""`-style quoting).
+ function handleSame(state, token, allowTriple, config) {
+     let stringPrefixes = config.stringPrefixes || defaults.stringPrefixes;
++    let closeBefore = config.before || defaults.before;
+     let dont = null, changes = state.changeByRange(range => {
+         if (!range.empty)
+             return { changes: [{ insert: token, from: range.from }, { insert: token, from: range.to }],
+@@ -1982,7 +1983,7 @@ function handleSame(state, token, allowTriple, config) {
+                 range: EditorSelection.cursor(pos + token.length) };
+         }
+         else if (state.charCategorizer(pos)(next) != CharCategory.Word) {
+-            if (canStartStringAt(state, pos, stringPrefixes) > -1 && !probablyInString(state, pos, token, stringPrefixes))
++            if ((!next || closeBefore.indexOf(next) > -1) && canStartStringAt(state, pos, stringPrefixes) > -1 && !probablyInString(state, pos, token, stringPrefixes))
+                 return { changes: { insert: token + token, from: pos },
+                     effects: closeBracketEffect.of(pos + token.length),
+                     range: EditorSelection.cursor(pos + token.length) };
