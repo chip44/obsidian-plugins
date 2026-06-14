@@ -1,3 +1,4 @@
+import { isolateHistory } from '@codemirror/commands';
 import type { ChangeSpec } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import { createFromBuffer, type Formatter } from '@dprint/formatter';
@@ -117,6 +118,7 @@ export default class PlumbPlugin extends Plugin {
 
     cm.dispatch({
       changes: diffResult.changes,
+      annotations: isolateHistory.of('full'),
       scrollIntoView: true,
       filter: false,
     });
