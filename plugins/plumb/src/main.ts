@@ -111,7 +111,7 @@ export default class PlumbPlugin extends Plugin {
       return;
     }
 
-    const diffResult = this.computeDiff(source, formatted);
+    const diffResult = this.computeDiff(source, formatted, from);
 
     const duration = performance.now() - durationStart;
 
@@ -126,9 +126,8 @@ export default class PlumbPlugin extends Plugin {
     );
   }
 
-  private computeDiff(source: string, formatted: string): DiffResult {
+  private computeDiff(source: string, formatted: string, pos: number): DiffResult {
     const changes: ChangeSpec[] = [];
-    let pos = 0;
     let changedLines = 0;
 
     const diffs = diff(source, formatted);
