@@ -17,7 +17,6 @@ interface SnippetEffect {
 
 const snippetEffect = StateEffect.define<SnippetEffect>();
 
-// @ts-expect-error: idk blame codemirror
 export const snippetTrigger = EditorState.transactionFilter.of((tr) => {
   if (!tr.docChanged || !tr.isUserEvent('input.type')) return tr;
 
