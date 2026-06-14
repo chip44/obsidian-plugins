@@ -1,7 +1,7 @@
 import { type EditorView } from '@codemirror/view';
+import { getNodeElement, getStateContext } from '@shared/context';
 import { type Editor, type MarkdownFileInfo, MarkdownView, type Menu } from 'obsidian';
 
-import { getNodeElement, getStateContext } from './context';
 import { getPluginConfig, getRuntimeData } from './settings';
 
 export function onContextMenu(
