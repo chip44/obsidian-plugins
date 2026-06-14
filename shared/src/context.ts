@@ -3,7 +3,8 @@ import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { SyntaxNodeRef } from '@lezer/common';
 
-type StateContext = 'math' | 'code' | null;
+export const STATE_CONTEXTS = [null, 'math', 'code'] as const;
+export type StateContext = (typeof STATE_CONTEXTS)[number];
 
 interface NodeContext {
   node: SyntaxNodeRef;

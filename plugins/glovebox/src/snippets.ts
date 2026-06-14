@@ -2,12 +2,23 @@ import { snippet } from '@codemirror/autocomplete';
 import { isolateHistory } from '@codemirror/commands';
 import { EditorState, StateEffect } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+import type { StateContext } from '@shared/context';
 
+import { getEnabledSnippetsForContext } from './context';
 import { getPluginConfig } from './settings';
 
-export type SnippetConfigMap = Record<string, string>;
+export interface SnippetConfig {
+  replacement: string;
+  scopes: StateContext[];
+}
 
-export type SnippetMap = Record<string, ReturnType<typeof snippet>>;
+export interface Snippet extends SnippetConfig {
+  apply: ReturnType<typeof snippet>;
+}
+
+export type SnippetConfigMap = Record<string, SnippetConfig>;
+
+export type SnippetMap = Record<string, Snippet>;
 
 interface SnippetEffect {
   trigger: string;
@@ -20,15 +31,16 @@ const snippetEffect = StateEffect.define<SnippetEffect>();
 export const snippetTrigger = EditorState.transactionFilter.of((tr) => {
   if (!tr.docChanged || !tr.isUserEvent('input.type')) return tr;
 
-  const config = getPluginConfig(tr.startState);
-
   const pos = tr.newSelection.main.head;
   const line = tr.newDoc.lineAt(pos);
   const text = line.text.slice(0, pos - line.from);
 
+  const config = getPluginConfig(tr.startState);
+  const enabledSnippets = getEnabledSnippetsForContext(tr.startState, config.snippets);
+
   // check all triggers, longest match wins
   let matched: string | undefined;
-  for (const trigger of Object.keys(config.snippets)) {
+  for (const trigger of Object.keys(enabledSnippets)) {
     if (text.endsWith(trigger) && (!matched || trigger.length > matched.length)) {
       matched = trigger;
     }
@@ -51,10 +63,10 @@ export const snippetRunner = EditorView.updateListener.of((update) => {
 
       const { trigger, from, to } = effect.value;
       const config = getPluginConfig(tr.startState);
-      const expand = config.snippets[trigger];
-      if (!expand) continue;
+      const s = config.snippets[trigger];
+      if (!s) continue;
 
-      expand(update.view, null, from, to);
+      s.apply(update.view, null, from, to);
       return;
     }
   }
