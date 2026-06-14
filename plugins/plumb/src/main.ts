@@ -11,6 +11,12 @@ interface DiffResult {
   changedLines: number;
 }
 
+const countLines = (text: string): number => {
+  const lines = text.split('\n');
+  // a trailing empty string from split means the text ended with \n, so the last "line" is empty and shouldn't be counted
+  return lines.at(-1) === '' ? lines.length - 1 : lines.length;
+};
+
 export default class PlumbPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
   private formatter?: Formatter;
@@ -138,7 +144,7 @@ export default class PlumbPlugin extends Plugin {
         case diff.INSERT: {
           changes.push({ from: pos, insert: text });
 
-          const insertedLines = (text.match(/\n/gu) ?? []).length;
+          const insertedLines = countLines(text);
           const nextOp = diffs[i + 1];
 
           // pure insertion (not part of a replace pair)
@@ -151,12 +157,12 @@ export default class PlumbPlugin extends Plugin {
           changes.push({ from: pos, to: pos + text.length });
           pos += text.length;
 
-          const deletedLines = (text.match(/\n/gu) ?? []).length;
+          const deletedLines = countLines(text);
           const nextOp = diffs[i + 1];
 
           if (nextOp?.[0] === diff.INSERT) {
-            // replace pair (delete followed by insert): count max of deleted vs inserted lines
-            const insertedLines = (nextOp[1].match(/\n/gu) ?? []).length;
+            // replace pair (delete followed by insert): count the larger of the 2 sides
+            const insertedLines = countLines(text);
             changedLines += Math.max(deletedLines, insertedLines);
           } else {
             // pure deletion
