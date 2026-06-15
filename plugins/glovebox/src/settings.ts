@@ -67,6 +67,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
     ) => {
       let currentTrigger = trigger;
       let currentReplacement = snippetConfig.replacement;
+      let currentScopes = snippetConfig.scopes;
 
       const snippetSetting = new Setting(container)
         .addText((text) => {
@@ -87,6 +88,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
 
               this.plugin.settings.snippets[currentTrigger] = value ?? {
                 replacement: currentReplacement,
+                scopes: currentScopes,
               };
               await this.plugin.saveSettings();
             });
