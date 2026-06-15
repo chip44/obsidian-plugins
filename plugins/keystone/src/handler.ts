@@ -98,7 +98,7 @@ export function onKeydown(event: KeyboardEvent, view: EditorView): void {
 
   if (!isEnabledForContext(view)) return;
 
-  const newEvent = Object.assign(event, { key: char });
+  const newEvent = cloneKeyboardEvent(event, { key: char, bubbles: false, cancelable: true });
   typeText(view, newEvent);
   event.preventDefault();
 }
@@ -114,17 +114,36 @@ function typeText(view: EditorView, newEvent: KeyboardEvent): void {
      * meaning another plugin consumed the key and we should not insert anything
      * ourselves.
      */
-    const unhandled = view.contentDOM.dispatchEvent(
-      Object.assign(newEvent, {
-        bubbles: false,
-        cancelable: true,
-      }),
-    );
+    const unhandled = view.contentDOM.dispatchEvent(newEvent);
     if (!unhandled) return;
   }
 
   view.dispatch({
     ...view.state.replaceSelection(newEvent.key),
     userEvent: 'input.type',
+  });
+}
+
+function cloneKeyboardEvent(
+  e: KeyboardEvent,
+  overrides: Partial<KeyboardEventInit> = {},
+): KeyboardEvent {
+  // somehow this is the only way to clone an event :^)
+  return new KeyboardEvent(e.type, {
+    key: e.key,
+    code: e.code,
+    ctrlKey: e.ctrlKey,
+    shiftKey: e.shiftKey,
+    altKey: e.altKey,
+    metaKey: e.metaKey,
+    repeat: e.repeat,
+    isComposing: e.isComposing,
+    bubbles: e.bubbles,
+    cancelable: e.cancelable,
+    composed: e.composed,
+    location: e.location,
+    detail: e.detail,
+    view: e.view,
+    ...overrides,
   });
 }
