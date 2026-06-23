@@ -1,33 +1,46 @@
 import { around } from 'monkey-around';
 import { Plugin } from 'obsidian';
 
+import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
+
 /* oxlint-disable typescript/no-unsafe-type-assertion eslint/require-unicode-regexp */
 
 // opening $
 const MATH_BEGIN = String.raw`^(\$)[^\s$]`;
-const MATH_BEGIN_NEW = new RegExp(MATH_BEGIN.replace(String.raw`\s`, ''));
+const MATH_BEGIN_NEW = new RegExp(String.raw`^(\$)[^$]`);
 
 // closing $
 const MATH_END = String.raw`^[^\s\\]\$([^0-9]|$)`;
-const MATH_END_NEW = new RegExp(MATH_END.replace(String.raw`\s`, ''));
-
-// Obsidian's hypermd mode (CM5) rejects inline math with spaces adjacent to $ via two regexes that include \s.
-// this removes those guards.
-const handleMathRegex = (pattern: RegExp): RegExp => {
-  if (pattern.flags !== '') return pattern;
-
-  const src = pattern.source;
-  if (src === MATH_BEGIN) return MATH_BEGIN_NEW;
-  if (src === MATH_END) return MATH_END_NEW;
-
-  return pattern;
-};
+const MATH_END_NEW = new RegExp(String.raw`^[^\\]\$([^0-9]|$)`);
+const MATH_END_NEW_NO_BACKSLASH = new RegExp(String.raw`^\$([^0-9]|$)`);
+const MATH_END2 = String.raw`[^\\]\$(.|$)`;
+const MATH_END2_NEW_NO_BACKSLASH = new RegExp(String.raw`\$(.|$)`);
 
 export default class BreathingRoomPlugin extends Plugin {
+  settings: PluginConfig = DEFAULT_CONFIG;
   private uninstallStringStreamMatch: () => void = () => {};
   private uninstallStringMatch: () => void = () => {};
 
-  onload(): void {
+  // oxlint-disable-next-line max-lines-per-function
+  async onload(): Promise<void> {
+    await this.loadSettings();
+    this.addSettingTab(new MyPluginSettingTab(this));
+
+    // Obsidian's hypermd mode (CM5) rejects inline math with spaces adjacent to $ via two regexes that include \s.
+    // this removes those guards.
+    const handleMathRegex = (pattern: RegExp): RegExp => {
+      if (pattern.flags !== '') return pattern;
+
+      const src = pattern.source;
+      if (src === MATH_BEGIN) return MATH_BEGIN_NEW;
+      if (src === MATH_END)
+        return this.settings.allowBackslash ? MATH_END_NEW_NO_BACKSLASH : MATH_END_NEW;
+      if (src === MATH_END2)
+        return this.settings.allowBackslash ? MATH_END2_NEW_NO_BACKSLASH : pattern;
+
+      return pattern;
+    };
+
     // the hypermd token function calls t.match() via CM5's StringStream (why does Obsidian still use CM5? idk).
     // we can't patch the mode directly (it's a closure on an internal CM5 instance, window.CodeMirrorAdapter, separate
     // from the public window.CodeMirror), so we intercept here instead.
@@ -69,5 +82,14 @@ export default class BreathingRoomPlugin extends Plugin {
   onunload(): void {
     this.uninstallStringMatch();
     this.uninstallStringStreamMatch();
+  }
+
+  async loadSettings(): Promise<void> {
+    // oxlint-disable-next-line typescript/no-unsafe-assignment
+    this.settings = Object.assign({}, DEFAULT_CONFIG, await this.loadData());
+  }
+
+  async saveSettings(): Promise<void> {
+    await this.saveData(this.settings);
   }
 }
