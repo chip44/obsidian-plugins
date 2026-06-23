@@ -55,6 +55,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
+  // oxlint-disable-next-line max-lines-per-function
   display(): void {
     const { containerEl } = this;
     containerEl.empty();

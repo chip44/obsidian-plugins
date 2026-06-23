@@ -15,6 +15,7 @@ export default defineConfig({
     'sort-keys': 'off',
     'no-ternary': 'off',
     'no-warning-comments': 'off',
+    'no-new': 'off',
     'typescript/prefer-readonly-parameter-types': 'off',
     'typescript/strict-boolean-expressions': 'off',
   },

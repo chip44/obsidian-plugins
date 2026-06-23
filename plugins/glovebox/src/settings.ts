@@ -131,6 +131,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
           el.createEl('br');
           el.createSpan({ text: 'See the replacement syntax ' });
           el.createEl('a', {
+            // eslint-disable-next-line obsidianmd/ui/sentence-case
             text: 'here',
             href: 'https://codemirror.net/docs/ref/#autocomplete.snippet',
           });
