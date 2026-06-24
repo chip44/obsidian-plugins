@@ -29,7 +29,7 @@ export default class PlumbPlugin extends Plugin {
 
     this.addCommand({
       id: 'format-file',
-      name: 'File',
+      name: 'Format file',
       icon: 'file-cog',
       editorCheckCallback: (checking, editor, ctx) => {
         if (checking) return ctx.file?.extension === 'md';
@@ -40,8 +40,8 @@ export default class PlumbPlugin extends Plugin {
 
     this.addCommand({
       id: 'format-selection',
-      name: 'Selection',
-      icon: 'square-dashed-text',
+      name: 'Format selection',
+      icon: 'text-selection',
       editorCheckCallback: (checking, editor, ctx) => {
         if (checking) return ctx.file?.extension === 'md';
         this.formatEditor(editor, 'selection');
