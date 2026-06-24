@@ -87,6 +87,7 @@ export default class PlumbPlugin extends Plugin {
     }
 
     // @ts-expect-error: conflicts with obsidian-typings
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const cm = editor.cm as EditorView;
 
     const sel = cm.state.selection.main;

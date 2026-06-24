@@ -12,6 +12,7 @@ export function onContextMenu(
   if (!(view instanceof MarkdownView)) return;
 
   // @ts-expect-error: conflicts with obsidian-typings
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   const editorView = editor.cm as EditorView;
 
   const config = getPluginConfig(editorView.state);
