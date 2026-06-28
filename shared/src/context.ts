@@ -83,8 +83,43 @@ function getTextAtPos(state: EditorState, pos: number, num: number = 1): string 
   return state.sliceDoc(pos, pos + num);
 }
 
+export function getLineElement(node: Node): HTMLElement | null {
+  return node.instanceOf(HTMLElement)
+    ? node.closest('.cm-line')
+    : (node.parentElement?.closest('.cm-line') ?? null);
+}
+
 export function getNodeElement(view: EditorView, node: SyntaxNodeRef): HTMLElement | null {
-  return view.domAtPos(node.from).node.parentElement?.closest('.cm-line') ?? null;
+  return getLineElement(view.domAtPos(node.from).node);
+}
+
+export function removeInbetweenElements(
+  start: Element,
+  end: Element,
+  root: Element = activeDocument.body,
+): void {
+  const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+
+  // advance to start
+  let node = walker.nextNode();
+  while (node && node !== start) {
+    node = walker.nextNode();
+  }
+  if (node !== start) return;
+
+  // collect everything between start and end
+  const toRemove: Element[] = [];
+  node = walker.nextNode();
+  while (node && node !== end) {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    toRemove.push(node as Element);
+    node = walker.nextNode();
+  }
+  if (node !== end) return;
+
+  for (const el of toRemove) {
+    el.remove();
+  }
 }
 
 function isMath(name: string): boolean {

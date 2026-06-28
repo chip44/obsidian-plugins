@@ -1,4 +1,5 @@
 import { type EditorView } from '@codemirror/view';
+import { getLineElement, removeInbetweenElements } from '@shared/context';
 
 import { isEnabledForContext } from './context';
 import { getPluginConfig } from './settings';
@@ -108,20 +109,91 @@ function typeText(view: EditorView, newEvent: KeyboardEvent): void {
 
   if (config.compatibilityMode) {
     /*
-     * dispatch a synthetic keydown so that other plugins (e.g. Latex Suite) can
-     * see the *modified* keystroke.
+     * dispatch a synthetic keydown so that other plugins that listen to keydown
+     * events (e.g. Latex Suite) can see the modified keystroke.
      * dispatchEvent() returns false if any listener called `preventDefault()`,
-     * meaning another plugin consumed the key and we should not insert anything
-     * ourselves.
+     * meaning another handler consumed the key and we should not insert
+     * anything ourselves.
      */
     const unhandled = view.contentDOM.dispatchEvent(newEvent);
     if (!unhandled) return;
+
+    /*
+     * mega hack to trigger internal CodeMirror input handlers + other external
+     * input handlers. this is required so that other handlers see the modified
+     * keystroke and act upon it (otherwise, they either use the old one or just
+     * don't run at all).
+     * it basically updates node.textContent manually (while handling cursor
+     * selection) which triggers CodeMirror's internal DOM observer, the same
+     * way a real user input event does it.
+     */
+    const node = view.domAtPos(view.state.selection.main.head).node;
+    insertTextDOM(node, newEvent.key);
+    return;
   }
 
   view.dispatch({
     ...view.state.replaceSelection(newEvent.key),
     userEvent: 'input.type',
   });
+}
+
+/*
+ * inserts text at current cursor position in the DOM
+ */
+// oxlint-disable-next-line max-lines-per-function
+function insertTextDOM(node: Node, text: string): void {
+  const selection = activeWindow.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+
+  const range = selection.getRangeAt(0);
+
+  // single-node selection (or no selection at all)
+  if (node.contains(range.startContainer) && node.contains(range.endContainer)) {
+    const textNode = activeDocument.createTextNode(text);
+    range.deleteContents();
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    return;
+  }
+
+  // multi-node selection
+  const startLine = getLineElement(range.startContainer);
+  const endLine = getLineElement(range.endContainer);
+  if (startLine?.parentElement && startLine.parentElement === endLine?.parentElement) {
+    const startText = range.startContainer.textContent ?? '';
+    const endText = range.endContainer.textContent ?? '';
+    const before = startText.slice(0, range.startOffset);
+    const after = endText.slice(range.endOffset);
+
+    if (startLine === endLine) {
+      range.startContainer.textContent = before + text;
+      range.endContainer.textContent = after;
+    } else {
+      // in multi-LINE selection, nodes are not actually combined so we have to
+      // manually add the rest of the text
+      range.startContainer.textContent = before + text + after;
+      range.endContainer.textContent = '';
+    }
+
+    removeInbetweenElements(
+      range.startContainer.parentElement!,
+      range.endContainer.parentElement!,
+      startLine.parentElement,
+    );
+
+    // this causes removeInbetweenElements to lose the end element so it must run after it
+    range.setStart(range.startContainer, before.length + text.length);
+    range.setEnd(range.startContainer, before.length + text.length);
+
+    return;
+  }
+
+  // fallback to regular append
+  node.textContent += text;
+  range.selectNodeContents(node);
+  range.collapse(false);
 }
 
 function cloneKeyboardEvent(
