@@ -1,10 +1,9 @@
 import { Facet } from '@codemirror/state';
+import { setInputCode } from '@shared/dom';
 import { PluginSettingTab, Setting } from 'obsidian';
 
 import type AutopairPlugin from './main';
 import { cleanStrings } from './utils';
-
-/* eslint-disable obsidianmd/no-static-styles-assignment */
 
 export interface PluginConfig {
   brackets: string[];
@@ -48,10 +47,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
       )
       .addText((text) =>
         text
-          .then((c) => {
-            c.inputEl.style.fontFamily = 'var(--font-monospace)';
-            c.inputEl.style.fontSize = 'var(--font-smaller)';
-          })
+          .then(setInputCode)
           .setPlaceholder(DEFAULT_CONFIG.brackets.join(' '))
           .setValue(this.plugin.settings.brackets.join(' '))
           .onChange(async (value) => {
@@ -67,10 +63,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
       )
       .addText((text) =>
         text
-          .then((c) => {
-            c.inputEl.style.fontFamily = 'var(--font-monospace)';
-            c.inputEl.style.fontSize = 'var(--font-smaller)';
-          })
+          .then(setInputCode)
           .setPlaceholder(DEFAULT_CONFIG.before.join(' '))
           .setValue(this.plugin.settings.before.join(' '))
           .onChange(async (value) => {

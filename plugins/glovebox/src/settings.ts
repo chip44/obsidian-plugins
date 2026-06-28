@@ -1,13 +1,13 @@
 import { snippet } from '@codemirror/autocomplete';
 import { type EditorState, Facet } from '@codemirror/state';
 import { STATE_CONTEXTS } from '@shared/context';
+import { setInputCode } from '@shared/dom';
 import { PluginSettingTab, Setting } from 'obsidian';
 
 import type GloveboxPlugin from './main';
 import type { SnippetConfig, SnippetConfigMap, SnippetMap } from './snippets';
 
 /* oxlint-disable max-lines-per-function */
-/* eslint-disable obsidianmd/no-static-styles-assignment */
 
 const DEFAULT_SNIPPET_TRIGGER: keyof SnippetConfigMap = '';
 const DEFAULT_SNIPPET_CONFIG: SnippetConfigMap[keyof SnippetConfigMap] = {
@@ -72,10 +72,9 @@ export class MyPluginSettingTab extends PluginSettingTab {
       const snippetSetting = new Setting(container)
         .addText((text) => {
           text
+            .then(setInputCode)
             .then((c) => {
-              c.inputEl.style.fontFamily = 'var(--font-monospace)';
-              c.inputEl.style.fontSize = 'var(--font-smaller)';
-              c.inputEl.style.width = '60%';
+              c.inputEl.setCssProps({ width: '60%' });
             })
             .setPlaceholder('Trigger')
             .setValue(trigger)
@@ -95,10 +94,9 @@ export class MyPluginSettingTab extends PluginSettingTab {
         })
         .addText((text) => {
           text
+            .then(setInputCode)
             .then((c) => {
-              c.inputEl.style.fontFamily = 'var(--font-monospace)';
-              c.inputEl.style.fontSize = 'var(--font-smaller)';
-              c.inputEl.style.width = '100%';
+              c.inputEl.setCssProps({ width: '100%' });
             })
             .setPlaceholder('Replacement')
             .setValue(snippetConfig.replacement)

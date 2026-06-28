@@ -1,10 +1,9 @@
 import { Facet } from '@codemirror/state';
+import { setInputCode } from '@shared/dom';
 import { PluginSettingTab, Setting } from 'obsidian';
 
 import type MatchBracketsPlugin from './main';
 import { cleanStrings } from './utils';
-
-/* eslint-disable obsidianmd/no-static-styles-assignment */
 
 export interface PluginConfig {
   brackets: string[];
@@ -39,10 +38,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
       .setDesc('Space-separated bracket pairs to match.')
       .addText((text) =>
         text
-          .then((c) => {
-            c.inputEl.style.fontFamily = 'var(--font-monospace)';
-            c.inputEl.style.fontSize = 'var(--font-smaller)';
-          })
+          .then(setInputCode)
           .setPlaceholder(DEFAULT_CONFIG.brackets.join(' '))
           .setValue(this.plugin.settings.brackets.join(' '))
           .onChange(async (value) => {
@@ -56,15 +52,12 @@ export class MyPluginSettingTab extends PluginSettingTab {
       .setDesc('The maximum distance to scan for matching brackets.')
       .addText((text) =>
         text
-          .then((c) => {
-            c.inputEl.style.fontFamily = 'var(--font-monospace)';
-            c.inputEl.style.fontSize = 'var(--font-smaller)';
-          })
+          .then(setInputCode)
           .setPlaceholder(DEFAULT_CONFIG.maxScanDistance.toString())
           .setValue(this.plugin.settings.maxScanDistance.toString())
           .onChange(async (value) => {
             this.plugin.settings.maxScanDistance =
-              Number.parseInt(value, 10) || DEFAULT_CONFIG.maxScanDistance;
+              Math.trunc(Number(value)) || DEFAULT_CONFIG.maxScanDistance;
             await this.plugin.saveSettings();
           }),
       );
