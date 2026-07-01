@@ -1,4 +1,3 @@
-import { Facet } from '@codemirror/state';
 import { setInputCode } from '@shared/dom';
 import { PluginSettingTab, Setting } from 'obsidian';
 
@@ -14,10 +13,6 @@ export const DEFAULT_CONFIG: PluginConfig = {
   brackets: ['()', '[]', '{}'],
   maxScanDistance: 10_000,
 };
-
-export const pluginConfig = Facet.define<PluginConfig, PluginConfig>({
-  combine: (values) => values[0] || DEFAULT_CONFIG,
-});
 
 export class MyPluginSettingTab extends PluginSettingTab {
   readonly plugin: MatchBracketsPlugin;

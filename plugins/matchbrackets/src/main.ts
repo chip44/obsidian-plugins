@@ -2,7 +2,7 @@ import { bracketMatching, type Config as BracketMatchingConfig } from '@codemirr
 import { type Extension } from '@codemirror/state';
 import { Plugin } from 'obsidian';
 
-import { DEFAULT_CONFIG, MyPluginSettingTab, pluginConfig, type PluginConfig } from './settings';
+import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
 import { cleanStrings } from './utils';
 
 export default class MatchBracketsPlugin extends Plugin {
@@ -14,7 +14,7 @@ export default class MatchBracketsPlugin extends Plugin {
     this.addSettingTab(new MyPluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
-      this.extensions.push(pluginConfig.of(this.settings), this.rebuildExtension());
+      this.extensions.push(this.rebuildExtension());
       this.registerEditorExtension(this.extensions);
     });
   }
@@ -36,7 +36,7 @@ export default class MatchBracketsPlugin extends Plugin {
     await this.saveData(this.settings);
 
     // mutate the extensions array
-    this.extensions[1] = this.rebuildExtension();
+    this.extensions[0] = this.rebuildExtension();
 
     this.app.workspace.updateOptions();
   }

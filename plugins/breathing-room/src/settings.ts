@@ -1,4 +1,3 @@
-import { Facet } from '@codemirror/state';
 import { PluginSettingTab, Setting } from 'obsidian';
 
 import type BreathingRoomPlugin from './main';
@@ -10,10 +9,6 @@ export interface PluginConfig {
 export const DEFAULT_CONFIG: PluginConfig = {
   allowBackslash: false,
 };
-
-export const pluginConfig = Facet.define<PluginConfig, PluginConfig>({
-  combine: (values) => values[0] || DEFAULT_CONFIG,
-});
 
 export class MyPluginSettingTab extends PluginSettingTab {
   readonly plugin: BreathingRoomPlugin;

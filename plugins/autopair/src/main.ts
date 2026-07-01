@@ -2,7 +2,7 @@ import { closeBrackets, type CloseBracketConfig } from '@codemirror/autocomplete
 import { EditorState, type Extension, Prec } from '@codemirror/state';
 import { Plugin } from 'obsidian';
 
-import { DEFAULT_CONFIG, MyPluginSettingTab, pluginConfig, type PluginConfig } from './settings';
+import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
 import { cleanStrings } from './utils';
 
 export default class AutopairPlugin extends Plugin {
@@ -14,11 +14,7 @@ export default class AutopairPlugin extends Plugin {
     this.addSettingTab(new MyPluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
-      this.extensions.push(
-        pluginConfig.of(this.settings),
-        this.rebuildExtension(),
-        closeBrackets(),
-      );
+      this.extensions.push(this.rebuildExtension(), closeBrackets());
       this.registerEditorExtension(this.extensions);
     });
   }
@@ -42,7 +38,7 @@ export default class AutopairPlugin extends Plugin {
     await this.saveData(this.settings);
 
     // mutate the extensions array
-    this.extensions[1] = this.rebuildExtension();
+    this.extensions[0] = this.rebuildExtension();
 
     this.app.workspace.updateOptions();
   }
