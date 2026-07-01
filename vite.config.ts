@@ -32,7 +32,7 @@ function copyToVaultPlugin(): Plugin {
       const outDir = path.resolve(this.environment.config.build.outDir);
 
       const obsidianPluginsDir = path.join(VAULT, '.obsidian/plugins');
-      if (!(await fs.promises.stat(obsidianPluginsDir)).isDirectory)
+      if (!(await fs.promises.stat(obsidianPluginsDir)).isDirectory())
         throw new Error("VAULT is invalid or missing '.obsidian/plugins' directory");
 
       const manifest = `${outDir}/manifest.json`;
