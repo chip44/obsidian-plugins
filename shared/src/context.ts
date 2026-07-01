@@ -126,11 +126,11 @@ function isMath(name: string): boolean {
   return name.contains('math');
 }
 
-export function isMathBegin(name: string): boolean {
+function isMathBegin(name: string): boolean {
   return name.contains('math-begin');
 }
 
-export function isMathEnd(name: string): boolean {
+function isMathEnd(name: string): boolean {
   return name.contains('math-end');
 }
 
