@@ -123,25 +123,25 @@ export function removeInbetweenElements(
 }
 
 function isMath(name: string): boolean {
-  return name.contains('math');
+  return name.includes('math');
 }
 
 function isMathBegin(name: string): boolean {
-  return name.contains('math-begin');
+  return name.includes('math-begin');
 }
 
 function isMathEnd(name: string): boolean {
-  return name.contains('math-end');
+  return name.includes('math-end');
 }
 
 function isCodeblock(name: string): boolean {
-  return name.contains('codeblock');
+  return name.includes('codeblock');
 }
 
 function isCodeblockBegin(name: string): boolean {
-  return name.contains('codeblock-begin');
+  return name.includes('codeblock-begin');
 }
 
 function isCodeblockEnd(name: string): boolean {
-  return name.contains('codeblock-end');
+  return name.includes('codeblock-end');
 }
