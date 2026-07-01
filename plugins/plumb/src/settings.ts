@@ -10,7 +10,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
   formatOnSave: false,
 };
 
-export class MyPluginSettingTab extends PluginSettingTab {
+export class PlumbPluginSettingTab extends PluginSettingTab {
   readonly plugin: PlumbPlugin;
   public icon = 'wand-sparkles';
 

@@ -46,7 +46,7 @@ export function getPluginConfig(state: EditorState): PluginConfig {
   return state.facet(pluginConfig);
 }
 
-export class MyPluginSettingTab extends PluginSettingTab {
+export class KeystonePluginSettingTab extends PluginSettingTab {
   readonly plugin: KeystonePlugin;
   public icon = 'keyboard';
 

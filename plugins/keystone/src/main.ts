@@ -7,7 +7,7 @@ import { onKeydown } from './handler';
 import {
   DEFAULT_CONFIG,
   handleRuntimeDataUpdate,
-  MyPluginSettingTab,
+  KeystonePluginSettingTab,
   pluginConfig,
   type PluginConfig,
 } from './settings';
@@ -18,7 +18,7 @@ export default class KeystonePlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings();
-    this.addSettingTab(new MyPluginSettingTab(this));
+    this.addSettingTab(new KeystonePluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
       this.registerEditorExtension([

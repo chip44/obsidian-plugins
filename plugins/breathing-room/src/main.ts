@@ -1,7 +1,7 @@
 import { around } from 'monkey-around';
 import { Plugin } from 'obsidian';
 
-import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
+import { DEFAULT_CONFIG, BreathingRoomPluginSettingTab, type PluginConfig } from './settings';
 
 /* oxlint-disable typescript/no-unsafe-type-assertion eslint/require-unicode-regexp */
 
@@ -24,7 +24,7 @@ export default class BreathingRoomPlugin extends Plugin {
   // oxlint-disable-next-line max-lines-per-function
   async onload(): Promise<void> {
     await this.loadSettings();
-    this.addSettingTab(new MyPluginSettingTab(this));
+    this.addSettingTab(new BreathingRoomPluginSettingTab(this));
 
     // Obsidian's hypermd mode (CM5) rejects inline math with spaces adjacent to $ via two regexes that include \s.
     // this removes those guards.

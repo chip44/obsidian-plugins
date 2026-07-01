@@ -15,7 +15,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
   before: [')', ']', '}', "'", '"', ':', ';', '>'],
 };
 
-export class MyPluginSettingTab extends PluginSettingTab {
+export class AutopairPluginSettingTab extends PluginSettingTab {
   readonly plugin: AutopairPlugin;
   public icon = 'braces';
 

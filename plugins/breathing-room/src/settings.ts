@@ -10,7 +10,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
   allowBackslash: false,
 };
 
-export class MyPluginSettingTab extends PluginSettingTab {
+export class BreathingRoomPluginSettingTab extends PluginSettingTab {
   readonly plugin: BreathingRoomPlugin;
   public icon = 'orbit';
 

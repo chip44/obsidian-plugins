@@ -1,7 +1,12 @@
 import type { Extension } from '@codemirror/state';
 import { Plugin } from 'obsidian';
 
-import { DEFAULT_CONFIG, MyPluginSettingTab, pluginConfig, type PluginConfig } from './settings';
+import {
+  DEFAULT_CONFIG,
+  GloveboxPluginSettingTab,
+  pluginConfig,
+  type PluginConfig,
+} from './settings';
 import { snippetRunner, snippetTrigger } from './snippets';
 
 export default class GloveboxPlugin extends Plugin {
@@ -10,7 +15,7 @@ export default class GloveboxPlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings();
-    this.addSettingTab(new MyPluginSettingTab(this));
+    this.addSettingTab(new GloveboxPluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
       this.extensions.push(pluginConfig.of(this.settings), snippetTrigger, snippetRunner);

@@ -5,7 +5,7 @@ import { createFromBuffer, type Formatter } from '@dprint/formatter';
 import diff from 'fast-diff';
 import { type Editor, MarkdownView, normalizePath, Plugin } from 'obsidian';
 
-import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
+import { DEFAULT_CONFIG, PlumbPluginSettingTab, type PluginConfig } from './settings';
 
 interface DiffResult {
   changes: ChangeSpec[];
@@ -25,7 +25,7 @@ export default class PlumbPlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings();
-    this.addSettingTab(new MyPluginSettingTab(this));
+    this.addSettingTab(new PlumbPluginSettingTab(this));
 
     this.addCommand({
       id: 'format-file',

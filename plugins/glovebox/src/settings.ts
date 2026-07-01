@@ -46,7 +46,7 @@ export function getPluginConfig(state: EditorState): PluginConfigRuntime {
   return state.facet(pluginConfig);
 }
 
-export class MyPluginSettingTab extends PluginSettingTab {
+export class GloveboxPluginSettingTab extends PluginSettingTab {
   readonly plugin: GloveboxPlugin;
   public icon = 'scissors';
 
