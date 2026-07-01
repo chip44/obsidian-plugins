@@ -1,9 +1,9 @@
 import { closeBrackets, type CloseBracketConfig } from '@codemirror/autocomplete';
 import { EditorState, type Extension, Prec } from '@codemirror/state';
+import { cleanStrings } from '@shared/utils';
 import { Plugin } from 'obsidian';
 
 import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
-import { cleanStrings } from './utils';
 
 export default class AutopairPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;

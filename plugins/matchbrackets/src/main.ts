@@ -1,9 +1,9 @@
 import { bracketMatching, type Config as BracketMatchingConfig } from '@codemirror/language';
 import { type Extension } from '@codemirror/state';
+import { cleanStrings } from '@shared/utils';
 import { Plugin } from 'obsidian';
 
 import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
-import { cleanStrings } from './utils';
 
 export default class MatchBracketsPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;

@@ -1,8 +1,8 @@
 import { setInputCode } from '@shared/dom';
+import { cleanStrings } from '@shared/utils';
 import { PluginSettingTab, Setting } from 'obsidian';
 
 import type MatchBracketsPlugin from './main';
-import { cleanStrings } from './utils';
 
 export interface PluginConfig {
   brackets: string[];
