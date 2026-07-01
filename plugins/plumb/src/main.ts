@@ -164,7 +164,7 @@ export default class PlumbPlugin extends Plugin {
 
           if (nextOp?.[0] === diff.INSERT) {
             // replace pair (delete followed by insert): count the larger of the 2 sides
-            const insertedLines = countLines(text);
+            const insertedLines = countLines(nextOp[1]);
             changedLines += Math.max(deletedLines, insertedLines);
           } else {
             // pure deletion
