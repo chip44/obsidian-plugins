@@ -139,6 +139,19 @@ function typeText(view: EditorView, newEvent: KeyboardEvent): void {
 }
 
 /*
+ * range.setStart/setEnd want a char offset on Text nodes but a child index on
+ * Elements, and an emptied container has 0 children, so resolve to the Text
+ * child (or offset 0 if none) to avoid IndexSizeError.
+ */
+function resolveTextPosition(container: Node, offset: number): [Node, number] {
+  if (container.nodeType !== Node.TEXT_NODE) {
+    const child = container.firstChild;
+    return child ? [child, offset] : [container, 0];
+  }
+  return [container, offset];
+}
+
+/*
  * inserts text at current cursor position in the DOM
  */
 // oxlint-disable-next-line max-lines-per-function
@@ -184,8 +197,12 @@ function insertTextDOM(node: Node, text: string): void {
     );
 
     // this causes removeInbetweenElements to lose the end element so it must run after it
-    range.setStart(range.startContainer, before.length + text.length);
-    range.setEnd(range.startContainer, before.length + text.length);
+    const [startNode, startOffset] = resolveTextPosition(
+      range.startContainer,
+      before.length + text.length,
+    );
+    range.setStart(startNode, startOffset);
+    range.setEnd(startNode, startOffset);
 
     return;
   }
