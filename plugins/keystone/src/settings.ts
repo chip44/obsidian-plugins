@@ -1,6 +1,6 @@
 import { Facet, type EditorState } from '@codemirror/state';
 import { EditorView, type ViewUpdate } from '@codemirror/view';
-import { PluginSettingTab, Setting } from 'obsidian';
+import { PluginSettingTab, SettingGroup } from 'obsidian';
 
 import type KeystonePlugin from './main';
 
@@ -60,52 +60,58 @@ export class KeystonePluginSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl)
-      .setName('Enable for math blocks')
-      .setDesc(
-        createFragment((el) => {
-          el.createSpan({ text: '(Includes both inline ' });
-          el.createEl('code', { text: '$…$' });
-          el.createSpan({ text: ' and blocks ' });
-          el.createEl('code', { text: '$$…$$' });
-          el.createSpan({ text: ')' });
-        }),
-      )
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.mathBlocks).onChange(async (value) => {
-          this.plugin.settings.mathBlocks = value;
-          await this.plugin.saveSettings();
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName('Enable for code blocks')
-      .setDesc('')
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.codeBlocks).onChange(async (value) => {
-          this.plugin.settings.codeBlocks = value;
-          await this.plugin.saveSettings();
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName('Context menu entry')
-      .setDesc('Add an option to toggle key remap for the selected block')
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.contextMenu).onChange(async (value) => {
-          this.plugin.settings.contextMenu = value;
-          await this.plugin.saveSettings();
-        }),
-      );
-
-    new Setting(containerEl)
-      .setName('Compatibility mode')
-      .setDesc('Try to fix conflicts with other plugins (e.g. Latex Suite)')
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.compatibilityMode).onChange(async (value) => {
-          this.plugin.settings.compatibilityMode = value;
-          await this.plugin.saveSettings();
-        }),
-      );
+    new SettingGroup(containerEl)
+      .addSetting((setting) => {
+        setting
+          .setName('Enable for math blocks')
+          .setDesc(
+            createFragment((el) => {
+              el.createSpan({ text: '(Includes both inline ' });
+              el.createEl('code', { text: '$…$' });
+              el.createSpan({ text: ' and blocks ' });
+              el.createEl('code', { text: '$$…$$' });
+              el.createSpan({ text: ')' });
+            }),
+          )
+          .addToggle((toggle) =>
+            toggle.setValue(this.plugin.settings.mathBlocks).onChange(async (value) => {
+              this.plugin.settings.mathBlocks = value;
+              await this.plugin.saveSettings();
+            }),
+          );
+      })
+      .addSetting((setting) => {
+        setting
+          .setName('Enable for code blocks')
+          .setDesc('')
+          .addToggle((toggle) =>
+            toggle.setValue(this.plugin.settings.codeBlocks).onChange(async (value) => {
+              this.plugin.settings.codeBlocks = value;
+              await this.plugin.saveSettings();
+            }),
+          );
+      })
+      .addSetting((setting) => {
+        setting
+          .setName('Context menu entry')
+          .setDesc('Add an option to toggle key remap for the selected block')
+          .addToggle((toggle) =>
+            toggle.setValue(this.plugin.settings.contextMenu).onChange(async (value) => {
+              this.plugin.settings.contextMenu = value;
+              await this.plugin.saveSettings();
+            }),
+          );
+      })
+      .addSetting((setting) => {
+        setting
+          .setName('Compatibility mode')
+          .setDesc('Try to fix conflicts with other plugins (e.g. Latex Suite)')
+          .addToggle((toggle) =>
+            toggle.setValue(this.plugin.settings.compatibilityMode).onChange(async (value) => {
+              this.plugin.settings.compatibilityMode = value;
+              await this.plugin.saveSettings();
+            }),
+          );
+      });
   }
 }
