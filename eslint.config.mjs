@@ -19,6 +19,7 @@ export default defineConfig([
     rules: {
       'no-undef': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
+      'eslint-comments/no-restricted-disable': 'off',
       'obsidianmd/ui/sentence-case': [
         'warn',
         {
