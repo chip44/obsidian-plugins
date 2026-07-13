@@ -159,6 +159,7 @@ function insertTextDOM(node: Node, text: string): void {
   const selection = activeWindow.getSelection();
   if (!selection || selection.rangeCount === 0) return;
 
+  node = getLineElement(node) ?? node;
   const range = selection.getRangeAt(0);
 
   // single-node selection (or no selection at all)
