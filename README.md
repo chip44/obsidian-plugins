@@ -10,6 +10,8 @@ Currently, you'll need to build plugins manually.
 
 Clone the repository, run `pnpm i`, then build a plugin with `PLUGIN=foo pnpm run build`.
 
+See [Development](#development) for more info.
+
 ## Available Plugins
 
 ### Autopair
@@ -68,3 +70,11 @@ dprint strictly follows the [CommonMark specification](https://spec.commonmark.o
 
 > [!NOTE]
 > The bundle size is quite large (~2 MB) due to WASM (which may impact Sync users), but the plugin loads it at runtime, so startup time is unaffected.
+
+## Development
+
+Use `PLUGIN=foo pnpm run dev` to start the development server which automatically rebuilds the plugin as you make changes.
+
+If the `VAULT` environment variable is set, the built plugin files are automatically copied to `<VAULT>/.obsidian/plugins/<plugin-id>/` after each built.
+
+`.env` files are also supported.
