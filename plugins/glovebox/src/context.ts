@@ -7,8 +7,7 @@ export function getEnabledSnippetsForContext(
   state: EditorState,
   snippets: SnippetConfigMap,
 ): SnippetConfigMap {
-  const nodeContext = getStateContext(state);
-  const scope = nodeContext ? nodeContext.context : null;
+  const scope = getStateContext(state).context;
   return Object.fromEntries(
     Object.entries(snippets).filter(([_, snippetConfig]) => snippetConfig.scopes.includes(scope)),
   );

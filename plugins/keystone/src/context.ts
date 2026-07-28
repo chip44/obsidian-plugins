@@ -7,7 +7,7 @@ export function isEnabledForContext(view: EditorView): boolean {
   const state = view.state;
 
   const nodeContext = getStateContext(state);
-  if (!nodeContext) return false;
+  if (!nodeContext.node) return false;
 
   const config = getPluginConfig(state);
 

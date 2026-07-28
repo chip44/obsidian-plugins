@@ -3,15 +3,15 @@ import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { SyntaxNodeRef } from '@lezer/common';
 
-export const STATE_CONTEXTS = [null, 'math', 'code'] as const;
+export const STATE_CONTEXTS = ['text', 'math', 'code'] as const;
 export type StateContext = (typeof STATE_CONTEXTS)[number];
 
 interface NodeContext {
-  node: SyntaxNodeRef;
+  node?: SyntaxNodeRef;
   context: StateContext;
 }
 
-export function getStateContext(state: EditorState): NodeContext | null {
+export function getStateContext(state: EditorState): NodeContext {
   let node: SyntaxNodeRef | null = null;
 
   node = nodeWithinEquation(state);
@@ -20,7 +20,7 @@ export function getStateContext(state: EditorState): NodeContext | null {
   node = nodeWithinCodeblock(state);
   if (node) return { node, context: 'code' };
 
-  return null;
+  return { context: 'text' };
 }
 
 function nodeWithinEquation(state: EditorState): SyntaxNodeRef | null {

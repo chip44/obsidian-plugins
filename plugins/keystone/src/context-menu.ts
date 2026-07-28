@@ -22,7 +22,7 @@ export function onContextMenu(
   if (!blacklistedNodes) return;
 
   const nodeContext = getStateContext(editorView.state);
-  if (!nodeContext) return;
+  if (!nodeContext.node) return;
   const element = getNodeElement(editorView, nodeContext.node);
   if (!element) return;
 
