@@ -38,9 +38,6 @@ Automatically expand snippets while typing.
 
 The plugin uses [CodeMirror](https://codemirror.net/)'s native snippets feature and exposes the configuration.
 
-> [!NOTE]
-> To change the scopes (text, math, code, etc) for each snippet, manually edit `data.json` in the plugin folder. The settings API is too primitive to create a normal interface for this without spaghetti code.
-
 ### Keystone
 
 Force QWERTY layout inside math and code blocks, regardless of system layout.

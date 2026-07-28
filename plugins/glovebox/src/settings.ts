@@ -2,6 +2,7 @@ import { snippet } from '@codemirror/autocomplete';
 import { type EditorState, Facet } from '@codemirror/state';
 import { STATE_CONTEXTS } from '@shared/context';
 import { setInputCode } from '@shared/dom';
+import { capitalize } from '@shared/utils';
 import { PluginSettingTab, SettingGroup } from 'obsidian';
 
 import type GloveboxPlugin from './main';
@@ -71,6 +72,7 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
 
       settingGroup.addSetting((setting) => {
         setting
+          .setNoInfo()
           .addText((text) => {
             text
               .then(setInputCode)
@@ -110,16 +112,36 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
                 await this.plugin.saveSettings();
               });
           })
-          .addExtraButton((extraButton) => {
-            extraButton.setIcon('trash').onClick(async () => {
-              delete this.plugin.settings.snippets[currentTrigger];
+          .addDropdown((dropdown) => {
+            dropdown.selectEl.multiple = true;
+            dropdown.selectEl.size = 1;
+            for (const scope of STATE_CONTEXTS) {
+              dropdown.addOption(scope, capitalize(scope));
+            }
+            for (const opt of dropdown.selectEl.options) {
+              // @ts-expect-error
+              opt.selected = currentScopes.includes(opt.value);
+            }
+            dropdown.onChange(async () => {
+              const selectedScopes = Array.from(dropdown.selectEl.selectedOptions).map(
+                (o) => o.value,
+              );
+              // @ts-expect-error
+              currentScopes = selectedScopes;
+              this.plugin.settings.snippets[currentTrigger].scopes = currentScopes;
               await this.plugin.saveSettings();
-              setting.settingEl.remove();
             });
+          })
+          .addExtraButton((extraButton) => {
+            extraButton
+              .setIcon('trash')
+              .setTooltip('Delete snippet')
+              .onClick(async () => {
+                delete this.plugin.settings.snippets[currentTrigger];
+                await this.plugin.saveSettings();
+                setting.settingEl.remove();
+              });
           });
-
-        // we don't need this
-        setting.infoEl.remove();
       });
     };
 
@@ -138,10 +160,6 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
               href: 'https://codemirror.net/docs/ref/#autocomplete.snippet',
             });
             el.createSpan({ text: '.' });
-            el.createEl('br');
-            el.createSpan({ text: 'To change the scopes of snippets, edit ' });
-            el.createEl('code', { text: 'data.json' });
-            el.createSpan({ text: ' directly in the plugin folder.' });
           }),
         )
         .addButton((button) => {

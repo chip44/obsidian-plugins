@@ -4,3 +4,11 @@
 export function cleanStrings(arr: string[]): string[] {
   return [...new Set(arr.map((s) => s.trim()).filter(Boolean))];
 }
+
+/*
+ * capitalize the first letter of a string
+ */
+export function capitalize(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
