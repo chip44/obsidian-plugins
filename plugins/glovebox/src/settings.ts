@@ -56,15 +56,15 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
         type: 'list',
         heading: 'Snippets',
         desc: createFragment((el) => {
-          el.createSpan({ text: 'Define triggers and their replacements.' });
+          el.appendText('Define triggers and their replacements.');
           el.createEl('br');
-          el.createSpan({ text: 'See the replacement syntax ' });
+          el.appendText('See the replacement syntax ');
           el.createEl('a', {
             // eslint-disable-next-line obsidianmd/ui/sentence-case -- mid-sentence link, shouldn't be capitalized
             text: 'here',
             href: 'https://codemirror.net/docs/ref/#autocomplete.snippet',
           });
-          el.createSpan({ text: '.' });
+          el.appendText('.');
         }),
         emptyState: 'No snippets yet.',
         addItem: {

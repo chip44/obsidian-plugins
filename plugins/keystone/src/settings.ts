@@ -60,11 +60,11 @@ export class KeystonePluginSettingTab extends PluginSettingTab {
       {
         name: 'Enable for math blocks',
         desc: createFragment((el) => {
-          el.createSpan({ text: 'Includes both inline ' });
+          el.appendText('Includes both inline ');
           el.createEl('code', { text: '$…$' });
-          el.createSpan({ text: ' and blocks ' });
+          el.appendText(' and blocks ');
           el.createEl('code', { text: '$$…$$' });
-          el.createSpan({ text: '.' });
+          el.appendText('.');
         }),
         control: {
           type: 'toggle',
