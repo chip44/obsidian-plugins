@@ -23,8 +23,9 @@ export class BreathingRoomPluginSettingTab extends PluginSettingTab {
     return [
       {
         name: 'Allow backslash (\\) before closing $',
-        desc: 'This might cause breakage, use sparingly.',
-        cls: 'mod-warning',
+        desc: createFragment((el) => {
+          el.createSpan({ text: 'This might cause breakage, use sparingly.', cls: 'mod-warning' });
+        }),
         control: {
           type: 'toggle',
           key: 'allowBackslash',
