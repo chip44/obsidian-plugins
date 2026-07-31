@@ -2,7 +2,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite build --watch --mode=development",
+    "dev:all": "MODE=development node scripts/build-all.ts",
     "build": "vite build",
+    "build:all": "MODE=production node scripts/build-all.ts",
     "lint": "oxlint && eslint .",
     "lint:fix": "oxlint --fix && eslint . --fix",
     "fmt": "oxfmt",
