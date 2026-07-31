@@ -70,7 +70,10 @@ dprint strictly follows the [CommonMark specification](https://spec.commonmark.o
 
 ## Development
 
-Use `PLUGIN=foo pnpm run dev` to start the development server which automatically rebuilds the plugin as you make changes.
+Use `PLUGIN=foo pnpm run dev` to start the development server which automatically rebuilds the specified plugin as you make changes.
+Alternatively, you can run `pnpm run dev:all` to watch all plugins at once.
+
+To create a release build, use `PLUGIN=foo pnpm run build` or `pnpm run build:all`.
 
 If the `VAULT` environment variable is set, the built plugin files are automatically copied to `<VAULT>/.obsidian/plugins/<plugin-id>/` after each built.
 
