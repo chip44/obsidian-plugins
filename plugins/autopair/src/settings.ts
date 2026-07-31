@@ -32,6 +32,7 @@ export class AutopairPluginSettingTab extends PluginSettingTab {
           key: 'brackets',
           placeholder: DEFAULT_CONFIG.brackets,
           validate: (value: string) =>
+            !value.trim() ||
             value
               .trim()
               .split(/\s+/u)
@@ -48,7 +49,7 @@ export class AutopairPluginSettingTab extends PluginSettingTab {
           key: 'before',
           placeholder: DEFAULT_CONFIG.before,
           validate: (value: string) =>
-            /^\S(?:\s+\S)*$/iu.test(value.trim())
+            !value.trim() || /^\S(?:\s+\S)*$/iu.test(value.trim())
               ? undefined
               : 'Characters must be space-separated.',
         },

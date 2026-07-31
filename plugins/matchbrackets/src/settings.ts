@@ -31,6 +31,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
           key: 'brackets',
           placeholder: DEFAULT_CONFIG.brackets,
           validate: (value: string) =>
+            !value.trim ||
             value
               .trim()
               .split(/\s+/u)
@@ -45,6 +46,7 @@ export class MyPluginSettingTab extends PluginSettingTab {
         control: {
           type: 'number',
           key: 'maxScanDistance',
+          defaultValue: DEFAULT_CONFIG.maxScanDistance,
           min: 0,
         },
       },
