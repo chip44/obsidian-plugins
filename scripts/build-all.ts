@@ -17,6 +17,7 @@ for (const plugin of plugins) {
 
   process.env.PLUGIN = plugin;
 
+  // oxlint-disable-next-line no-await-in-loop
   await build({
     configFile: path.resolve('vite.config.ts'),
     mode,

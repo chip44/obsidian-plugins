@@ -4,6 +4,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 export default defineConfig([
   globalIgnores([
     'node_modules',
+    'scripts',
     'plugins/**/main.js',
     'eslint.config.mjs',
     'vite.config.ts',
