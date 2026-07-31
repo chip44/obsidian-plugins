@@ -7,15 +7,14 @@ import dprintMd from '@dprint/markdown';
 import { defineConfig, loadEnv, type Plugin, type UserConfig } from 'vite';
 
 function bundleFilePlugin(filePath: string, outputFileName?: string): Plugin {
+  filePath = path.resolve(filePath);
   return {
     name: 'bundle-file',
-    buildStart() {
-      this.addWatchFile(filePath);
-    },
     generateBundle() {
       this.emitFile({
         type: 'asset',
         fileName: outputFileName ?? path.basename(filePath),
+        originalFileName: filePath,
         source: fs.readFileSync(filePath),
       });
     },
