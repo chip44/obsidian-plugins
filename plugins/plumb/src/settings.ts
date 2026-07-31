@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting } from 'obsidian';
+import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 
 import type PlumbPlugin from './main';
 
@@ -19,19 +19,15 @@ export class PlumbPluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new Setting(containerEl)
-      .setName('Format on save')
-      .setDesc('')
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.formatOnSave).onChange(async (value) => {
-          this.plugin.settings.formatOnSave = value;
-          await this.plugin.saveSettings();
-        }),
-      );
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: 'Format on save',
+        control: {
+          type: 'toggle',
+          key: 'formatOnSave',
+        },
+      },
+    ];
   }
 }

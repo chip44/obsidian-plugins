@@ -21,7 +21,7 @@ export default class MatchBracketsPlugin extends Plugin {
 
   private rebuildExtension(): Extension {
     const config: BracketMatchingConfig = {
-      brackets: cleanStrings(this.settings.brackets).join(''),
+      brackets: cleanStrings(this.settings.brackets.split(' ')).join(''),
       maxScanDistance: this.settings.maxScanDistance,
     };
     return bracketMatching(config);

@@ -1,16 +1,14 @@
-import { setInputCode } from '@shared/dom';
-import { cleanStrings } from '@shared/utils';
-import { PluginSettingTab, SettingGroup } from 'obsidian';
+import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 
 import type MatchBracketsPlugin from './main';
 
 export interface PluginConfig {
-  brackets: string[];
+  brackets: string;
   maxScanDistance: number;
 }
 
 export const DEFAULT_CONFIG: PluginConfig = {
-  brackets: ['()', '[]', '{}'],
+  brackets: '() [] {}',
   maxScanDistance: 10_000,
 };
 
@@ -23,42 +21,33 @@ export class MyPluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new SettingGroup(containerEl)
-      .addSetting((setting) => {
-        setting
-          .setName('Brackets')
-          .setDesc('Space-separated bracket pairs to match.')
-          .addText((text) =>
-            text
-              .then(setInputCode)
-              .setPlaceholder(DEFAULT_CONFIG.brackets.join(' '))
-              .setValue(this.plugin.settings.brackets.join(' '))
-              .onChange(async (value) => {
-                this.plugin.settings.brackets = cleanStrings(value.split(' '));
-                await this.plugin.saveSettings();
-              }),
-          );
-      })
-      .addSetting((setting) => {
-        setting
-          .setName('Max scan distance')
-          .setDesc('The maximum distance to scan for matching brackets.')
-          .addText((text) =>
-            text
-              .then(setInputCode)
-              .setPlaceholder(DEFAULT_CONFIG.maxScanDistance.toString())
-              .setValue(this.plugin.settings.maxScanDistance.toString())
-              .onChange(async (value) => {
-                this.plugin.settings.maxScanDistance =
-                  Math.trunc(Number(value)) || DEFAULT_CONFIG.maxScanDistance;
-                await this.plugin.saveSettings();
-              }),
-          );
-      });
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: 'Brackets',
+        desc: 'Bracket pairs to match.',
+        control: {
+          type: 'text',
+          key: 'brackets',
+          placeholder: DEFAULT_CONFIG.brackets,
+          validate: (value: string) =>
+            value
+              .trim()
+              .split(/\s+/u)
+              .every((pair) => pair.length === 2 && pair[0] !== pair[1])
+              ? undefined
+              : 'Pairs must be space-separated and different characters.',
+        },
+      },
+      {
+        name: 'Max scan distance',
+        desc: 'The maximum distance to scan for matching brackets.',
+        control: {
+          type: 'number',
+          key: 'maxScanDistance',
+          min: 0,
+        },
+      },
+    ];
   }
 }

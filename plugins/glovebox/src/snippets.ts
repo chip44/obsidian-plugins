@@ -8,6 +8,7 @@ import { getEnabledSnippetsForContext } from './context';
 import { getPluginConfig } from './settings';
 
 export interface SnippetConfig {
+  trigger: string;
   replacement: string;
   scopes: StateContext[];
 }
@@ -15,10 +16,6 @@ export interface SnippetConfig {
 export interface Snippet extends SnippetConfig {
   apply: ReturnType<typeof snippet>;
 }
-
-export type SnippetConfigMap = Record<string, SnippetConfig>;
-
-export type SnippetMap = Record<string, Snippet>;
 
 interface SnippetEffect {
   trigger: string;
@@ -40,9 +37,9 @@ export const snippetTrigger = EditorState.transactionFilter.of((tr) => {
 
   // check all triggers, longest match wins
   let matched: string | undefined;
-  for (const trigger of Object.keys(enabledSnippets)) {
-    if (text.endsWith(trigger) && (!matched || trigger.length > matched.length)) {
-      matched = trigger;
+  for (const snippet of enabledSnippets) {
+    if (text.endsWith(snippet.trigger) && (!matched || snippet.trigger.length > matched.length)) {
+      matched = snippet.trigger;
     }
   }
   if (!matched) return tr;
@@ -63,7 +60,7 @@ export const snippetRunner = EditorView.updateListener.of((update) => {
 
       const { trigger, from, to } = effect.value;
       const config = getPluginConfig(tr.startState);
-      const s = config.snippets[trigger];
+      const s = config.snippets.find((x) => x.trigger === trigger);
       if (!s) continue;
 
       s.apply(update.view, null, from, to);

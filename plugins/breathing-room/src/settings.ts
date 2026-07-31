@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting } from 'obsidian';
+import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 
 import type BreathingRoomPlugin from './main';
 
@@ -19,30 +19,17 @@ export class BreathingRoomPluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new Setting(containerEl)
-      .setName(
-        createFragment((el) => {
-          el.createSpan({ text: 'Allow backslash (' });
-          el.createEl('code', { text: '\\' });
-          el.createSpan({ text: ') before closing ' });
-          el.createEl('code', { text: '$' });
-        }),
-      )
-      .setDesc(
-        createFragment((el) => {
-          el.createSpan({ text: 'This might cause breakage, use sparingly.', cls: 'mod-warning' });
-        }),
-      )
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.allowBackslash).onChange(async (value) => {
-          this.plugin.settings.allowBackslash = value;
-          await this.plugin.saveSettings();
-        }),
-      );
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: 'Allow backslash (\\) before closing $',
+        desc: 'This might cause breakage, use sparingly.',
+        cls: 'mod-warning',
+        control: {
+          type: 'toggle',
+          key: 'allowBackslash',
+        },
+      },
+    ];
   }
 }

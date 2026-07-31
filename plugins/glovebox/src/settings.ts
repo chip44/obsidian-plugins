@@ -3,29 +3,23 @@ import { type EditorState, Facet } from '@codemirror/state';
 import { STATE_CONTEXTS } from '@shared/context';
 import { setInputCode } from '@shared/dom';
 import { capitalize } from '@shared/utils';
-import { PluginSettingTab, SettingGroup } from 'obsidian';
+import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 
 import type GloveboxPlugin from './main';
-import type { SnippetConfig, SnippetConfigMap, SnippetMap } from './snippets';
+import type { Snippet, SnippetConfig } from './snippets';
 
-/* oxlint-disable max-lines-per-function */
-
-const DEFAULT_SNIPPET_TRIGGER: keyof SnippetConfigMap = '';
-const DEFAULT_SNIPPET_CONFIG: SnippetConfigMap[keyof SnippetConfigMap] = {
-  replacement: '',
-  scopes: [...STATE_CONTEXTS],
-};
+/* oxlint-disable eslint/max-lines-per-function */
 
 export interface PluginConfig {
-  snippets: SnippetConfigMap;
+  snippets: SnippetConfig[];
 }
 
 export interface PluginConfigRuntime extends Omit<PluginConfig, 'snippets'> {
-  snippets: SnippetMap;
+  snippets: Snippet[];
 }
 
 export const DEFAULT_CONFIG: PluginConfig = {
-  snippets: {},
+  snippets: [],
 };
 
 export const pluginConfig = Facet.define<PluginConfig, PluginConfigRuntime>({
@@ -33,12 +27,12 @@ export const pluginConfig = Facet.define<PluginConfig, PluginConfigRuntime>({
     const config: PluginConfig = values[0] || DEFAULT_CONFIG;
     return {
       ...config,
-      snippets: Object.fromEntries(
-        Object.entries(config.snippets).map(([k, v]) => [
-          k,
-          { ...v, apply: snippet(v.replacement) },
-        ]),
-      ),
+      snippets: config.snippets.map((s) => ({
+        trigger: s.trigger,
+        replacement: s.replacement,
+        scopes: s.scopes,
+        apply: snippet(s.replacement),
+      })),
     };
   },
 });
@@ -56,122 +50,103 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    const addSnippetRow = (
-      settingGroup: SettingGroup,
-      trigger: string,
-      snippetConfig: SnippetConfig,
-    ) => {
-      let currentTrigger = trigger;
-      let currentReplacement = snippetConfig.replacement;
-      let currentScopes = snippetConfig.scopes;
-
-      settingGroup.addSetting((setting) => {
-        setting
-          .setNoInfo()
-          .addText((text) => {
-            text
-              .then(setInputCode)
-              .then((c) => {
-                c.inputEl.setCssProps({ width: '60%' });
-              })
-              .setPlaceholder('Trigger')
-              .setValue(trigger)
-              .onChange(async (newTrigger) => {
-                // re-key the entry
-                const value = this.plugin.settings.snippets[currentTrigger];
-                delete this.plugin.settings.snippets[currentTrigger];
-
-                currentTrigger = newTrigger;
-
-                this.plugin.settings.snippets[currentTrigger] = value ?? {
-                  replacement: currentReplacement,
-                  scopes: currentScopes,
-                };
-                await this.plugin.saveSettings();
-              });
-          })
-          .addText((text) => {
-            text
-              .then(setInputCode)
-              .then((c) => {
-                c.inputEl.setCssProps({ width: '100%' });
-              })
-              .setPlaceholder('Replacement')
-              .setValue(snippetConfig.replacement)
-              .onChange(async (newReplacement) => {
-                currentReplacement = newReplacement;
-
-                if (!this.plugin.settings.snippets[currentTrigger]) return;
-
-                this.plugin.settings.snippets[currentTrigger].replacement = newReplacement;
-                await this.plugin.saveSettings();
-              });
-          })
-          .addDropdown((dropdown) => {
-            dropdown.selectEl.multiple = true;
-            dropdown.selectEl.size = 1;
-            for (const scope of STATE_CONTEXTS) {
-              dropdown.addOption(scope, capitalize(scope));
-            }
-            for (const opt of dropdown.selectEl.options) {
-              // @ts-expect-error
-              opt.selected = currentScopes.includes(opt.value);
-            }
-            dropdown.onChange(async () => {
-              const selectedScopes = Array.from(dropdown.selectEl.selectedOptions).map(
-                (o) => o.value,
-              );
-              // @ts-expect-error
-              currentScopes = selectedScopes;
-              this.plugin.settings.snippets[currentTrigger].scopes = currentScopes;
-              await this.plugin.saveSettings();
-            });
-          })
-          .addExtraButton((extraButton) => {
-            extraButton
-              .setIcon('trash')
-              .setTooltip('Delete snippet')
-              .onClick(async () => {
-                delete this.plugin.settings.snippets[currentTrigger];
-                await this.plugin.saveSettings();
-                setting.settingEl.remove();
-              });
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        type: 'list',
+        heading: 'Snippets',
+        desc: createFragment((el) => {
+          el.createSpan({ text: 'Define triggers and their replacements.' });
+          el.createEl('br');
+          el.createSpan({ text: 'See the replacement syntax ' });
+          el.createEl('a', {
+            // eslint-disable-next-line obsidianmd/ui/sentence-case -- mid-sentence link, shouldn't be capitalized
+            text: 'here',
+            href: 'https://codemirror.net/docs/ref/#autocomplete.snippet',
           });
-      });
-    };
-
-    const settingGroup = new SettingGroup(containerEl).addSetting((setting) => {
-      setting
-        .setHeading()
-        .setName('Snippets')
-        .setDesc(
-          createFragment((el) => {
-            el.createSpan({ text: 'Define triggers and their replacements.' });
-            el.createEl('br');
-            el.createSpan({ text: 'See the replacement syntax ' });
-            el.createEl('a', {
-              // eslint-disable-next-line obsidianmd/ui/sentence-case
-              text: 'here',
-              href: 'https://codemirror.net/docs/ref/#autocomplete.snippet',
+          el.createSpan({ text: '.' });
+        }),
+        emptyState: 'No snippets yet.',
+        addItem: {
+          name: 'Add snippet',
+          action: () => {
+            this.plugin.settings.snippets.push({
+              trigger: '',
+              replacement: '',
+              scopes: [...STATE_CONTEXTS],
             });
-            el.createSpan({ text: '.' });
-          }),
-        )
-        .addButton((button) => {
-          button.setButtonText('Add snippet').onClick(() => {
-            addSnippetRow(settingGroup, DEFAULT_SNIPPET_TRIGGER, DEFAULT_SNIPPET_CONFIG);
-          });
-        });
-    });
+            void this.plugin.saveSettings();
+            this.update();
+          },
+        },
+        onReorder: (oldIndex, newIndex) => {
+          let snippets = this.plugin.settings.snippets;
+          let [moved] = snippets.splice(oldIndex, 1);
+          snippets.splice(newIndex, 0, moved);
+          void this.plugin.saveSettings();
+          this.update();
+        },
+        onDelete: (idx) => {
+          this.plugin.settings.snippets.splice(idx, 1);
+          void this.plugin.saveSettings();
+          this.update();
+        },
+        items: this.plugin.settings.snippets.map((s, i) => ({
+          name: '',
+          searchable: false,
+          render: (setting) => {
+            setting
+              .addText((text) => {
+                text
+                  .then(setInputCode)
+                  .then((c) => {
+                    c.inputEl.setCssProps({ width: '60%' });
+                  })
+                  .setPlaceholder('Trigger')
+                  .setValue(s.trigger)
+                  .onChange(async (value) => {
+                    this.plugin.settings.snippets[i].trigger = value;
+                    await this.plugin.saveSettings();
+                  });
+              })
+              .addText((text) => {
+                text
+                  .then(setInputCode)
+                  .then((c) => {
+                    c.inputEl.setCssProps({ width: '100%' });
+                  })
+                  .setPlaceholder('Replacement')
+                  .setValue(s.replacement)
+                  .onChange(async (value) => {
+                    this.plugin.settings.snippets[i].replacement = value;
+                    await this.plugin.saveSettings();
+                  });
+              })
+              .addDropdown((dropdown) => {
+                dropdown.selectEl.multiple = true;
+                dropdown.selectEl.size = 1;
+                for (const scope of STATE_CONTEXTS) {
+                  dropdown.addOption(scope, capitalize(scope));
+                }
+                for (const opt of dropdown.selectEl.options) {
+                  // @ts-expect-error: string to narrower-string conversion
+                  opt.selected = s.scopes.includes(opt.value);
+                }
+                dropdown.onChange(async () => {
+                  const selectedScopes = Array.from(dropdown.selectEl.selectedOptions).map(
+                    (o) => o.value,
+                  );
+                  // @ts-expect-error: always valid
+                  this.plugin.settings.snippets[i].scopes = selectedScopes;
+                  await this.plugin.saveSettings();
+                });
+              });
 
-    // load existing snippets on open
-    for (const [trigger, snippetConfig] of Object.entries(this.plugin.settings.snippets)) {
-      addSnippetRow(settingGroup, trigger, snippetConfig);
-    }
+            // we don't need this
+            setting.infoEl.remove();
+          },
+        })),
+      },
+    ];
   }
 }

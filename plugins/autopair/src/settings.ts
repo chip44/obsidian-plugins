@@ -1,18 +1,16 @@
-import { setInputCode } from '@shared/dom';
-import { cleanStrings } from '@shared/utils';
-import { PluginSettingTab, SettingGroup } from 'obsidian';
+import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 
 import type AutopairPlugin from './main';
 
 export interface PluginConfig {
-  brackets: string[];
-  before: string[];
+  brackets: string;
+  before: string;
 }
 
 export const DEFAULT_CONFIG: PluginConfig = {
   // Obsidian defaults
-  brackets: ['(', '[', '{', "'", '"', '*', '_', '`', '```'],
-  before: [')', ']', '}', "'", '"', ':', ';', '>'],
+  brackets: '( [ { \' " * _ ` ```',
+  before: ') ] } \' " : ; >',
 };
 
 export class AutopairPluginSettingTab extends PluginSettingTab {
@@ -24,51 +22,37 @@ export class AutopairPluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new SettingGroup(containerEl)
-      .addSetting((setting) => {
-        setting
-          .setName('Brackets')
-          .setDesc(
-            createFragment((el) => {
-              el.createSpan({
-                text: 'Space-separated opening brackets to close. Brackets may be single characters or a triple of quotes (as in ',
-              });
-              el.createEl('code', { text: "\"'''\"" });
-              el.createSpan({ text: ').' });
-            }),
-          )
-          .addText((text) =>
-            text
-              .then(setInputCode)
-              .setPlaceholder(DEFAULT_CONFIG.brackets.join(' '))
-              .setValue(this.plugin.settings.brackets.join(' '))
-              .onChange(async (value) => {
-                this.plugin.settings.brackets = cleanStrings(value.split(' '));
-                await this.plugin.saveSettings();
-              }),
-          );
-      })
-      .addSetting((setting) => {
-        setting
-          .setName('Before')
-          .setDesc(
-            'Space-separated characters in front of which newly opened brackets are automatically closed.',
-          )
-          .addText((text) =>
-            text
-              .then(setInputCode)
-              .setPlaceholder(DEFAULT_CONFIG.before.join(' '))
-              .setValue(this.plugin.settings.before.join(' '))
-              .onChange(async (value) => {
-                this.plugin.settings.before = cleanStrings(value.split(' '));
-                await this.plugin.saveSettings();
-              }),
-          );
-      });
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: 'Brackets',
+        desc: 'Opening brackets to close.',
+        control: {
+          type: 'text',
+          key: 'brackets',
+          placeholder: DEFAULT_CONFIG.brackets,
+          validate: (value: string) =>
+            value
+              .trim()
+              .split(/\s+/u)
+              .every((token) => /^(.)(?:|\1{2})$/iu.test(token))
+              ? undefined
+              : 'Characters must be space-separated and may be single characters or a triple of the same character.',
+        },
+      },
+      {
+        name: 'Before',
+        desc: 'Characters in front of which newly opened brackets are automatically closed.',
+        control: {
+          type: 'text',
+          key: 'before',
+          placeholder: DEFAULT_CONFIG.before,
+          validate: (value: string) =>
+            /^\S(?:\s+\S)*$/iu.test(value.trim())
+              ? undefined
+              : 'Characters must be space-separated.',
+        },
+      },
+    ];
   }
 }

@@ -21,8 +21,8 @@ export default class AutopairPlugin extends Plugin {
 
   private rebuildExtension(): Extension {
     const config: CloseBracketConfig = {
-      brackets: cleanStrings(this.settings.brackets),
-      before: cleanStrings(this.settings.before).join(''),
+      brackets: cleanStrings(this.settings.brackets.split(' ')),
+      before: cleanStrings(this.settings.before.split(' ')).join(''),
       stringPrefixes: [','],
     };
     // precedence must be higher than `default` which is the precedence of the builtin autopair extension

@@ -2,7 +2,7 @@
   "id": "obsidian-glovebox",
   "name": "Glovebox",
   "version": "1.0.0",
-  "minAppVersion": "1.0.0",
+  "minAppVersion": "1.13.0",
   "description": "Snippet expansion",
   "author": "chip44",
   "authorUrl": "https://github.com/chip44",

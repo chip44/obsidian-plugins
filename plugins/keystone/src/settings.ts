@@ -1,6 +1,6 @@
 import { Facet, type EditorState } from '@codemirror/state';
 import { EditorView, type ViewUpdate } from '@codemirror/view';
-import { PluginSettingTab, SettingGroup } from 'obsidian';
+import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 
 import type KeystonePlugin from './main';
 
@@ -55,63 +55,45 @@ export class KeystonePluginSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  // oxlint-disable-next-line max-lines-per-function
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
-
-    new SettingGroup(containerEl)
-      .addSetting((setting) => {
-        setting
-          .setName('Enable for math blocks')
-          .setDesc(
-            createFragment((el) => {
-              el.createSpan({ text: '(Includes both inline ' });
-              el.createEl('code', { text: '$…$' });
-              el.createSpan({ text: ' and blocks ' });
-              el.createEl('code', { text: '$$…$$' });
-              el.createSpan({ text: ')' });
-            }),
-          )
-          .addToggle((toggle) =>
-            toggle.setValue(this.plugin.settings.mathBlocks).onChange(async (value) => {
-              this.plugin.settings.mathBlocks = value;
-              await this.plugin.saveSettings();
-            }),
-          );
-      })
-      .addSetting((setting) => {
-        setting
-          .setName('Enable for code blocks')
-          .setDesc('')
-          .addToggle((toggle) =>
-            toggle.setValue(this.plugin.settings.codeBlocks).onChange(async (value) => {
-              this.plugin.settings.codeBlocks = value;
-              await this.plugin.saveSettings();
-            }),
-          );
-      })
-      .addSetting((setting) => {
-        setting
-          .setName('Context menu entry')
-          .setDesc('Add an option to toggle key remap for the selected block')
-          .addToggle((toggle) =>
-            toggle.setValue(this.plugin.settings.contextMenu).onChange(async (value) => {
-              this.plugin.settings.contextMenu = value;
-              await this.plugin.saveSettings();
-            }),
-          );
-      })
-      .addSetting((setting) => {
-        setting
-          .setName('Compatibility mode')
-          .setDesc('Try to fix conflicts with other plugins (e.g. Latex Suite)')
-          .addToggle((toggle) =>
-            toggle.setValue(this.plugin.settings.compatibilityMode).onChange(async (value) => {
-              this.plugin.settings.compatibilityMode = value;
-              await this.plugin.saveSettings();
-            }),
-          );
-      });
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: 'Enable for math blocks',
+        desc: createFragment((el) => {
+          el.createSpan({ text: 'Includes both inline ' });
+          el.createEl('code', { text: '$…$' });
+          el.createSpan({ text: ' and blocks ' });
+          el.createEl('code', { text: '$$…$$' });
+          el.createSpan({ text: '.' });
+        }),
+        control: {
+          type: 'toggle',
+          key: 'mathBlocks',
+        },
+      },
+      {
+        name: 'Enable for code blocks',
+        control: {
+          type: 'toggle',
+          key: 'codeBlocks',
+        },
+      },
+      {
+        name: 'Context menu entry',
+        desc: 'Add an option to toggle key remap for the selected block.',
+        control: {
+          type: 'toggle',
+          key: 'contextMenu',
+        },
+      },
+      {
+        name: 'Compatibility mode',
+        desc: 'Try to fix conflicts with other plugins (e.g. Latex Suite).',
+        control: {
+          type: 'toggle',
+          key: 'compatibilityMode',
+        },
+      },
+    ];
   }
 }

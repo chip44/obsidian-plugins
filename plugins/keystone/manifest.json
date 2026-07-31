@@ -2,7 +2,7 @@
   "id": "obsidian-keystone",
   "name": "Keystone",
   "version": "1.0.0",
-  "minAppVersion": "1.0.0",
+  "minAppVersion": "1.13.0",
   "description": "Type math and code in QWERTY, whatever your system layout.",
   "author": "chip44",
   "authorUrl": "https://github.com/chip44",
