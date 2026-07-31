@@ -53,8 +53,8 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
   getSettingDefinitions(): SettingDefinitionItem[] {
     return [
       {
-        type: 'list',
-        heading: 'Snippets',
+        type: 'page',
+        name: 'Snippets',
         desc: createFragment((el) => {
           el.appendText('Define triggers and their replacements.');
           el.createEl('br');
@@ -66,86 +66,95 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
           });
           el.appendText('.');
         }),
-        emptyState: 'No snippets yet.',
-        addItem: {
-          name: 'Add snippet',
-          action: () => {
-            this.plugin.settings.snippets.push({
-              trigger: '',
-              replacement: '',
-              scopes: [...STATE_CONTEXTS],
-            });
-            void this.plugin.saveSettings();
-            this.update();
-          },
-        },
-        onReorder: (oldIndex, newIndex) => {
-          let snippets = this.plugin.settings.snippets;
-          let [moved] = snippets.splice(oldIndex, 1);
-          snippets.splice(newIndex, 0, moved);
-          void this.plugin.saveSettings();
-          this.update();
-        },
-        onDelete: (idx) => {
-          this.plugin.settings.snippets.splice(idx, 1);
-          void this.plugin.saveSettings();
-          this.update();
-        },
-        items: this.plugin.settings.snippets.map((s, i) => ({
-          name: '',
-          searchable: false,
-          render: (setting) => {
-            setting
-              .addText((text) => {
-                text
-                  .then(setInputCode)
-                  .then((c) => {
-                    c.inputEl.setCssProps({ width: '60%' });
-                  })
-                  .setPlaceholder('Trigger')
-                  .setValue(s.trigger)
-                  .onChange(async (value) => {
-                    this.plugin.settings.snippets[i].trigger = value;
-                    await this.plugin.saveSettings();
-                  });
-              })
-              .addText((text) => {
-                text
-                  .then(setInputCode)
-                  .then((c) => {
-                    c.inputEl.setCssProps({ width: '100%' });
-                  })
-                  .setPlaceholder('Replacement')
-                  .setValue(s.replacement)
-                  .onChange(async (value) => {
-                    this.plugin.settings.snippets[i].replacement = value;
-                    await this.plugin.saveSettings();
-                  });
-              })
-              .addDropdown((dropdown) => {
-                dropdown.selectEl.multiple = true;
-                dropdown.selectEl.size = 1;
-                for (const scope of STATE_CONTEXTS) {
-                  dropdown.addOption(scope, capitalize(scope));
-                }
-                for (const opt of dropdown.selectEl.options) {
-                  // @ts-expect-error: string to narrower-string conversion
-                  opt.selected = s.scopes.includes(opt.value);
-                }
-                dropdown.onChange(async () => {
-                  const selectedScopes = Array.from(dropdown.selectEl.selectedOptions).map(
-                    (o) => o.value,
-                  );
-                  // @ts-expect-error: always valid
-                  this.plugin.settings.snippets[i].scopes = selectedScopes;
-                  await this.plugin.saveSettings();
+        displayValue: `${this.plugin.settings.snippets.length} snippet${this.plugin.settings.snippets.length > 1 ? 's' : ''}`,
+        items: [
+          {
+            type: 'list',
+            emptyState: 'No snippets yet.',
+            addItem: {
+              name: 'Add snippet',
+              action: () => {
+                this.plugin.settings.snippets.push({
+                  trigger: '',
+                  replacement: '',
+                  scopes: [...STATE_CONTEXTS],
                 });
-              });
+                void this.plugin.saveSettings();
+                this.update();
+              },
+            },
+            onReorder: (oldIndex, newIndex) => {
+              let snippets = this.plugin.settings.snippets;
+              let [moved] = snippets.splice(oldIndex, 1);
+              snippets.splice(newIndex, 0, moved);
+              void this.plugin.saveSettings();
+              this.update();
+            },
+            onDelete: (idx) => {
+              this.plugin.settings.snippets.splice(idx, 1);
+              void this.plugin.saveSettings();
+              this.update();
+            },
+            search: {
+              placeholder: 'Search snippets...',
+              match: (def, query) => def.name.includes(query),
+            },
+            items: this.plugin.settings.snippets.map((s, i) => ({
+              name: `'${this.plugin.settings.snippets[i].trigger}' → '${this.plugin.settings.snippets[i].replacement}'`,
+              render: (setting) => {
+                setting
+                  .addText((text) => {
+                    text
+                      .then(setInputCode)
+                      .then((c) => {
+                        c.inputEl.setCssProps({ width: '60%' });
+                      })
+                      .setPlaceholder('Trigger')
+                      .setValue(s.trigger)
+                      .onChange(async (value) => {
+                        this.plugin.settings.snippets[i].trigger = value;
+                        await this.plugin.saveSettings();
+                      });
+                  })
+                  .addText((text) => {
+                    text
+                      .then(setInputCode)
+                      .then((c) => {
+                        c.inputEl.setCssProps({ width: '100%' });
+                      })
+                      .setPlaceholder('Replacement')
+                      .setValue(s.replacement)
+                      .onChange(async (value) => {
+                        this.plugin.settings.snippets[i].replacement = value;
+                        await this.plugin.saveSettings();
+                      });
+                  })
+                  .addDropdown((dropdown) => {
+                    dropdown.selectEl.multiple = true;
+                    dropdown.selectEl.size = 1;
+                    for (const scope of STATE_CONTEXTS) {
+                      dropdown.addOption(scope, capitalize(scope));
+                    }
+                    for (const opt of dropdown.selectEl.options) {
+                      // @ts-expect-error: string to narrower-string conversion
+                      opt.selected = s.scopes.includes(opt.value);
+                    }
+                    dropdown.onChange(async () => {
+                      const selectedScopes = Array.from(dropdown.selectEl.selectedOptions).map(
+                        (o) => o.value,
+                      );
+                      // @ts-expect-error: always valid
+                      this.plugin.settings.snippets[i].scopes = selectedScopes;
+                      await this.plugin.saveSettings();
+                    });
+                  });
 
-            // we don't need this
-            setting.infoEl.remove();
+                // we don't need this
+                setting.infoEl.remove();
+              },
+            })),
           },
-        })),
+        ],
       },
     ];
   }
