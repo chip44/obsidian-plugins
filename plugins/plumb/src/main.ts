@@ -102,9 +102,10 @@ export default class PlumbPlugin extends Plugin {
       fileText: source,
       overrideConfig: {
         lineWidth: 0,
-        // TODO: these are currently ignored by dprint's Markdown plugin (as of v0.22.1)
-        // useTabs: this.app.vault.getConfig('useTab') as boolean,
-        // indentWidth: this.app.vault.getConfig('tabSize') as number,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+        useTabs: this.app.vault.getConfig('useTab') as boolean,
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+        indentWidth: this.app.vault.getConfig('tabSize') as number,
       },
     });
 
