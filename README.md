@@ -66,7 +66,7 @@ Format notes using [dprint](https://dprint.dev/plugins/markdown/).
 dprint strictly follows the [CommonMark specification](https://spec.commonmark.org/) so unfortunately it's not very customizable, but hey at least it's fast and consistent!
 
 > [!NOTE]
-> The bundle size is quite large (~2 MB) due to WASM (which may impact Sync users), but the plugin loads it at runtime, so startup time is unaffected.
+> The bundle size is quite large (~750 KB) due to WASM (which may impact Sync users), but the plugin loads it at runtime, so startup time is unaffected.
 
 ## Development
 
