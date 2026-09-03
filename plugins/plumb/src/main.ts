@@ -1,6 +1,5 @@
 import { isolateHistory } from '@codemirror/commands';
 import type { ChangeSpec } from '@codemirror/state';
-import type { EditorView } from '@codemirror/view';
 import { createFromBuffer, type Formatter } from '@dprint/formatter';
 import diff from 'fast-diff';
 import { type Editor, MarkdownView, normalizePath, Plugin } from 'obsidian';
@@ -86,9 +85,7 @@ export default class PlumbPlugin extends Plugin {
       return;
     }
 
-    // @ts-expect-error: conflicts with obsidian-typings
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-    const cm = editor.cm as EditorView;
+    const cm = editor.cm;
 
     const sel = cm.state.selection.main;
     const [from, to] = mode === 'file' ? [0, cm.state.doc.length] : [sel.from, sel.to];

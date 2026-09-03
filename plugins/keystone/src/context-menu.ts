@@ -1,4 +1,3 @@
-import { type EditorView } from '@codemirror/view';
 import { getNodeElement, getStateContext } from '@shared/context';
 import { type Editor, type MarkdownFileInfo, MarkdownView, type Menu } from 'obsidian';
 
@@ -11,9 +10,7 @@ export function onContextMenu(
 ): void {
   if (!(view instanceof MarkdownView)) return;
 
-  // @ts-expect-error: conflicts with obsidian-typings
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-  const editorView = editor.cm as EditorView;
+  const editorView = editor.cm;
 
   const config = getPluginConfig(editorView.state);
   if (!config.contextMenu) return;
