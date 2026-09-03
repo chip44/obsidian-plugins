@@ -101,11 +101,12 @@ export default class PlumbPlugin extends Plugin {
       filePath: this.app.workspace.getActiveFile()?.path ?? '',
       fileText: source,
       overrideConfig: {
+        // handled by Obsidian
         lineWidth: 0,
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        useTabs: this.app.vault.getConfig('useTab') as boolean,
-        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-        indentWidth: this.app.vault.getConfig('tabSize') as number,
+        'table.skipFormat': true,
+        // inherit from Obsidian
+        useTabs: this.app.vault.getConfig('useTab'),
+        indentWidth: this.app.vault.getConfig('tabSize'),
       },
     });
 
