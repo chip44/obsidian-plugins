@@ -85,14 +85,7 @@ export default class PlumbPlugin extends Plugin {
     const formatted = this.formatter.formatText({
       filePath: this.app.workspace.getActiveFile()?.path ?? '',
       fileText: source,
-      overrideConfig: {
-        // handled by Obsidian
-        lineWidth: 0,
-        'table.skipFormat': true,
-        // inherit from Obsidian
-        useTabs: this.app.vault.getConfig('useTab'),
-        indentWidth: this.app.vault.getConfig('tabSize'),
-      },
+      overrideConfig: this.getFormatConfig(),
     });
 
     if (source === formatted) {
@@ -111,9 +104,27 @@ export default class PlumbPlugin extends Plugin {
       filter: false,
     });
 
-    new Notice(
-      `Formatted ${diffResult.changedLines} line${diffResult.changedLines === 1 ? '' : 's'} in ${Math.round(duration)} ms`,
-    );
+    if (this.settings.showNotice) {
+      const n = diffResult.changedLines;
+      new Notice(`Formatted ${n} line${n === 1 ? '' : 's'} in ${duration.toFixed(1)} ms`);
+    }
+  }
+
+  private getFormatConfig(): Record<string, unknown> {
+    // reference: https://dprint.dev/plugins/markdown/config/
+    return {
+      // handled by Obsidian
+      lineWidth: 0,
+      'table.skipFormat': true,
+      // inherit from Obsidian
+      useTabs: this.app.vault.getConfig('useTab'),
+      indentWidth: this.app.vault.getConfig('tabSize'),
+      // user config
+      emphasisKind: this.settings.emphasisKind,
+      strongKind: this.settings.strongKind,
+      'list.unorderedMarker': this.settings.unorderedListMarker,
+      maxBlankLines: this.settings.maxBlankLines,
+    };
   }
 
   async loadSettings(): Promise<void> {
