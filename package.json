@@ -5,8 +5,8 @@
     "dev:all": "MODE=development node scripts/build-all.ts",
     "build": "vite build",
     "build:all": "MODE=production node scripts/build-all.ts",
-    "lint": "oxlint && eslint .",
-    "lint:fix": "oxlint --fix && eslint . --fix",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check"
   },
@@ -21,18 +21,16 @@
     "@codemirror/commands": "^6.11.0",
     "@codemirror/language": "^6.12.4",
     "@codemirror/state": "^6.7.2",
-    "@codemirror/view": "^6.43.10",
+    "@codemirror/view": "^6.43.11",
     "@lezer/common": "^1.5.2",
     "@obsidian-typings/obsidian-public-latest": "^6.36.0",
     "@types/node": "^26.4.1",
-    "@typescript/native": "npm:typescript@^7.0.2",
-    "eslint": "^10.9.1",
     "eslint-plugin-obsidianmd": "^0.4.2",
     "obsidian": "^1.13.1",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
     "oxlint-tsgolint": "^7.0.2001",
-    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript": "^7.0.2",
     "vite": "^8.2.2"
   }
 }

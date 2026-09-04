@@ -3,7 +3,7 @@ import { Plugin } from 'obsidian';
 
 import { DEFAULT_CONFIG, BreathingRoomPluginSettingTab, type PluginConfig } from './settings';
 
-/* oxlint-disable typescript/no-unsafe-type-assertion eslint/require-unicode-regexp */
+/* oxlint-disable typescript/no-unsafe-type-assertion require-unicode-regexp */
 
 // opening $
 const MATH_BEGIN = String.raw`^(\$)[^\s$]`;
@@ -85,7 +85,6 @@ export default class BreathingRoomPlugin extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    // oxlint-disable-next-line typescript/no-unsafe-assignment
     this.settings = Object.assign({}, DEFAULT_CONFIG, await this.loadData());
   }
 

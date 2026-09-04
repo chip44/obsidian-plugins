@@ -28,7 +28,6 @@ export default class MatchBracketsPlugin extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    // oxlint-disable-next-line typescript/no-unsafe-assignment
     this.settings = Object.assign({}, DEFAULT_CONFIG, await this.loadData());
   }
 

@@ -8,7 +8,7 @@ import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 import type GloveboxPlugin from './main';
 import type { Snippet, SnippetConfig } from './snippets';
 
-/* oxlint-disable eslint/max-lines-per-function */
+/* oxlint-disable max-lines-per-function */
 
 export interface PluginConfig {
   snippets: SnippetConfig[];
@@ -60,7 +60,7 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
           el.createEl('br');
           el.appendText('See the replacement syntax ');
           el.createEl('a', {
-            // eslint-disable-next-line obsidianmd/ui/sentence-case -- mid-sentence link, shouldn't be capitalized
+            // oxlint-disable-next-line obsidianmd/ui/sentence-case -- mid-sentence link, shouldn't be capitalized
             text: 'here',
             href: 'https://codemirror.net/docs/ref/#autocomplete.snippet',
           });

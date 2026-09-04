@@ -1,2 +1,3 @@
 patchedDependencies:
   '@codemirror/autocomplete': patches/@codemirror__autocomplete.patch
+  eslint-plugin-obsidianmd: patches/eslint-plugin-obsidianmd.patch

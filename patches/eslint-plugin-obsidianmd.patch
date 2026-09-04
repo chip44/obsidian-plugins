@@ -1,0 +1,39 @@
+diff --git a/dist/lib/index.js b/dist/lib/index.js
+index 70d3da1b99ec5f9125376fb498df8bb972c74a46..8e863093d96e2f80a5178205ab83b87b26a931a1 100644
+--- a/dist/lib/index.js
++++ b/dist/lib/index.js
+@@ -32,7 +32,6 @@ import { ui } from "./rules/ui/index.js";
+ // --- Import plugins and configs for the recommended config ---
+ import js from "@eslint/js";
+ import json from "@eslint/json";
+-import tseslint from "typescript-eslint";
+ import sdl from "@microsoft/eslint-plugin-sdl";
+ import * as importPlugin from "eslint-plugin-import";
+ import depend from 'eslint-plugin-depend';
+@@ -229,7 +228,7 @@ const flatRecommendedConfig = defineConfig([
+             "eslint-comments": eslintComments,
+         },
+         files: ['**/*.{js,cjs,mjs,jsx}'],
+-        extends: [...tseslint.configs.recommended, noUnsanitizedPlugin.configs.recommended],
++        extends: [noUnsanitizedPlugin.configs.recommended],
+         rules: {
+             ...flatRecommendedGeneralRules,
+             ...recommendedPluginRulesConfigBase
+@@ -244,7 +243,7 @@ const flatRecommendedConfig = defineConfig([
+             "eslint-comments": eslintComments,
+         },
+         files: ['**/*.{ts,cts,mts,tsx}'],
+-        extends: [...tseslint.configs.recommendedTypeChecked, noUnsanitizedPlugin.configs.recommended],
++        extends: [noUnsanitizedPlugin.configs.recommended],
+         rules: {
+             ...flatRecommendedGeneralRules,
+             ...recommendedPluginRulesConfig
+@@ -253,7 +252,7 @@ const flatRecommendedConfig = defineConfig([
+     {
+         files: ['package.json'],
+         language: 'json/json',
+-        extends: [tseslint.configs.disableTypeChecked],
++        extends: [],
+         plugins: {
+             depend,
+             json
