@@ -1,6 +1,7 @@
 import { isolateHistory } from '@codemirror/commands';
 import type { EditorView } from '@codemirror/view';
 import { createFromBuffer, type Formatter } from '@dprint/formatter';
+import { noop, type Uninstaller } from '@shared/utils';
 import { around } from 'monkey-around';
 import { MarkdownView, normalizePath, Plugin, type Command } from 'obsidian';
 
@@ -10,7 +11,7 @@ import { DEFAULT_CONFIG, PlumbPluginSettingTab, type PluginConfig } from './sett
 export default class PlumbPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
   private formatter?: Formatter;
-  private uninstallCheckCallback: () => void = () => {};
+  private uninstallCheckCallback: Uninstaller = noop;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -62,7 +63,7 @@ export default class PlumbPlugin extends Plugin {
 
     this.uninstallCheckCallback = around(this.app.commands.commands['editor:save-file'], {
       checkCallback(oldCheckCallback) {
-        if (!oldCheckCallback) return () => {};
+        if (!oldCheckCallback) return noop;
         return function (this: Command, ...args: Parameters<typeof oldCheckCallback>) {
           const result = oldCheckCallback?.apply(this, args);
           const checking = args[0];

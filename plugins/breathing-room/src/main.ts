@@ -1,3 +1,4 @@
+import { noop, type Uninstaller } from '@shared/utils';
 import { around } from 'monkey-around';
 import { Plugin } from 'obsidian';
 
@@ -18,8 +19,8 @@ const MATH_END2_NEW_NO_BACKSLASH = new RegExp(String.raw`\$(.|$)`);
 
 export default class BreathingRoomPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
-  private uninstallStringStreamMatch: () => void = () => {};
-  private uninstallStringMatch: () => void = () => {};
+  private uninstallStringStreamMatch: Uninstaller = noop;
+  private uninstallStringMatch: Uninstaller = noop;
 
   // oxlint-disable-next-line max-lines-per-function
   async onload(): Promise<void> {
