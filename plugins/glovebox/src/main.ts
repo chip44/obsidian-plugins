@@ -18,7 +18,7 @@ export default class GloveboxPlugin extends Plugin {
     this.addSettingTab(new GloveboxPluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
-      this.extensions.push(pluginConfig.of(this.settings), snippetTrigger, snippetRunner);
+      this.setEditorExtensions();
       this.registerEditorExtension(this.extensions);
     });
   }
@@ -29,10 +29,12 @@ export default class GloveboxPlugin extends Plugin {
 
   async saveSettings(): Promise<void> {
     await this.saveData(this.settings);
-
-    // WHY DO I HAVE TO RECONFIGURE THIS
-    this.extensions[0] = pluginConfig.of(this.settings);
-
+    this.setEditorExtensions();
     this.app.workspace.updateOptions();
+  }
+
+  private setEditorExtensions(): void {
+    while (this.extensions.length > 0) this.extensions.pop();
+    this.extensions.push(pluginConfig.of(this.settings), snippetTrigger, snippetRunner);
   }
 }

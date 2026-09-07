@@ -14,9 +14,19 @@ export default class MatchBracketsPlugin extends Plugin {
     this.addSettingTab(new MyPluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
-      this.extensions.push(this.rebuildExtension());
+      this.setEditorExtensions();
       this.registerEditorExtension(this.extensions);
     });
+  }
+
+  async loadSettings(): Promise<void> {
+    this.settings = Object.assign({}, DEFAULT_CONFIG, await this.loadData());
+  }
+
+  async saveSettings(): Promise<void> {
+    await this.saveData(this.settings);
+    this.setEditorExtensions();
+    this.app.workspace.updateOptions();
   }
 
   private rebuildExtension(): Extension {
@@ -27,16 +37,8 @@ export default class MatchBracketsPlugin extends Plugin {
     return bracketMatching(config);
   }
 
-  async loadSettings(): Promise<void> {
-    this.settings = Object.assign({}, DEFAULT_CONFIG, await this.loadData());
-  }
-
-  async saveSettings(): Promise<void> {
-    await this.saveData(this.settings);
-
-    // mutate the extensions array
-    this.extensions[0] = this.rebuildExtension();
-
-    this.app.workspace.updateOptions();
+  private setEditorExtensions(): void {
+    while (this.extensions.length > 0) this.extensions.pop();
+    this.extensions.push(this.rebuildExtension());
   }
 }
