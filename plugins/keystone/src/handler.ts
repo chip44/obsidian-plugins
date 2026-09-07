@@ -1,7 +1,7 @@
 import { type EditorView } from '@codemirror/view';
-import { getLineElement, removeInbetweenElements } from '@shared/context';
 
 import { isEnabledForContext } from './context';
+import { cloneKeyboardEvent, insertTextDOM } from './dom';
 import { getPluginConfig } from './settings';
 
 const qwertyMap: Record<string, string> = {
@@ -135,105 +135,5 @@ function typeText(view: EditorView, newEvent: KeyboardEvent): void {
   view.dispatch({
     ...view.state.replaceSelection(newEvent.key),
     userEvent: 'input.type',
-  });
-}
-
-/**
- * range.setStart/setEnd want a char offset on Text nodes but a child index on
- * Elements, and an emptied container has 0 children, so resolve to the Text
- * child (or offset 0 if none) to avoid IndexSizeError.
- */
-function resolveTextPosition(container: Node, offset: number): [Node, number] {
-  if (container.nodeType !== Node.TEXT_NODE) {
-    const child = container.firstChild;
-    return child ? [child, offset] : [container, 0];
-  }
-  return [container, offset];
-}
-
-/**
- * inserts text at current cursor position in the DOM
- */
-// oxlint-disable-next-line max-lines-per-function
-function insertTextDOM(node: Node, text: string): void {
-  const selection = activeWindow.getSelection();
-  if (!selection || selection.rangeCount === 0) return;
-
-  node = getLineElement(node) ?? node;
-  const range = selection.getRangeAt(0);
-
-  // single-node selection (or no selection at all)
-  if (node.contains(range.startContainer) && node.contains(range.endContainer)) {
-    const textNode = activeDocument.createTextNode(text);
-    range.deleteContents();
-    range.insertNode(textNode);
-    range.setStartAfter(textNode);
-    range.setEndAfter(textNode);
-    return;
-  }
-
-  // multi-node selection
-  const startLine = getLineElement(range.startContainer);
-  const endLine = getLineElement(range.endContainer);
-  if (startLine?.parentElement && startLine.parentElement === endLine?.parentElement) {
-    const startText = range.startContainer.textContent ?? '';
-    const endText = range.endContainer.textContent ?? '';
-    const before = startText.slice(0, range.startOffset);
-    const after = endText.slice(range.endOffset);
-
-    if (startLine === endLine) {
-      range.startContainer.textContent = before + text;
-      range.endContainer.textContent = after;
-    } else {
-      // in multi-LINE selection, nodes are not actually combined so we have to
-      // manually add the rest of the text
-      range.startContainer.textContent = before + text + after;
-      range.endContainer.textContent = '';
-    }
-
-    removeInbetweenElements(
-      range.startContainer.parentElement!,
-      range.endContainer.parentElement!,
-      startLine.parentElement,
-    );
-
-    // this causes removeInbetweenElements to lose the end element so it must run after it
-    const [startNode, startOffset] = resolveTextPosition(
-      range.startContainer,
-      before.length + text.length,
-    );
-    range.setStart(startNode, startOffset);
-    range.setEnd(startNode, startOffset);
-
-    return;
-  }
-
-  // fallback to regular append
-  node.textContent += text;
-  range.selectNodeContents(node);
-  range.collapse(false);
-}
-
-function cloneKeyboardEvent(
-  e: KeyboardEvent,
-  overrides: Partial<KeyboardEventInit> = {},
-): KeyboardEvent {
-  // somehow this is the only way to clone an event :^)
-  return new KeyboardEvent(e.type, {
-    key: e.key,
-    code: e.code,
-    ctrlKey: e.ctrlKey,
-    shiftKey: e.shiftKey,
-    altKey: e.altKey,
-    metaKey: e.metaKey,
-    repeat: e.repeat,
-    isComposing: e.isComposing,
-    bubbles: e.bubbles,
-    cancelable: e.cancelable,
-    composed: e.composed,
-    location: e.location,
-    detail: e.detail,
-    view: e.view,
-    ...overrides,
   });
 }

@@ -7,3 +7,9 @@ export function setInputCode(component: TextComponent): void {
     'font-size': 'var(--font-smaller)',
   });
 }
+
+export function getLineElement(node: Node): HTMLElement | null {
+  return node.instanceOf(HTMLElement)
+    ? node.closest('.cm-line')
+    : (node.parentElement?.closest('.cm-line') ?? null);
+}
