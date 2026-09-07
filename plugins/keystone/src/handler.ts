@@ -138,7 +138,7 @@ function typeText(view: EditorView, newEvent: KeyboardEvent): void {
   });
 }
 
-/*
+/**
  * range.setStart/setEnd want a char offset on Text nodes but a child index on
  * Elements, and an emptied container has 0 children, so resolve to the Text
  * child (or offset 0 if none) to avoid IndexSizeError.
@@ -151,7 +151,7 @@ function resolveTextPosition(container: Node, offset: number): [Node, number] {
   return [container, offset];
 }
 
-/*
+/**
  * inserts text at current cursor position in the DOM
  */
 // oxlint-disable-next-line max-lines-per-function
