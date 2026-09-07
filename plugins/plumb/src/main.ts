@@ -1,6 +1,8 @@
 import { isolateHistory } from '@codemirror/commands';
+import type { EditorView } from '@codemirror/view';
 import { createFromBuffer, type Formatter } from '@dprint/formatter';
-import { type Editor, MarkdownView, normalizePath, Plugin } from 'obsidian';
+import { around } from 'monkey-around';
+import { MarkdownView, normalizePath, Plugin, type Command } from 'obsidian';
 
 import { computeDiff } from './diff';
 import { DEFAULT_CONFIG, PlumbPluginSettingTab, type PluginConfig } from './settings';
@@ -8,19 +10,33 @@ import { DEFAULT_CONFIG, PlumbPluginSettingTab, type PluginConfig } from './sett
 export default class PlumbPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
   private formatter?: Formatter;
-  private originalSaveCallback?: (checking: boolean) => boolean | void;
+  private uninstallCheckCallback: () => void = () => {};
 
   async onload(): Promise<void> {
     await this.loadSettings();
     this.addSettingTab(new PlumbPluginSettingTab(this));
 
+    this.addCommands();
+
+    this.app.workspace.onLayoutReady(async () => {
+      const wasmPath = normalizePath(`${this.manifest.dir!}/dprint_plugin_markdown.wasm`);
+      const buffer = await this.app.vault.adapter.readBinary(wasmPath);
+      this.formatter = createFromBuffer(buffer);
+    });
+  }
+
+  onunload(): void {
+    this.uninstallCheckCallback();
+  }
+
+  private addCommands(): void {
     this.addCommand({
       id: 'format-file',
       name: 'Format file',
       icon: 'file-cog',
       editorCheckCallback: (checking, editor, ctx) => {
         if (checking) return ctx.file?.extension === 'md';
-        this.formatEditor(editor, 'file');
+        this.formatEditor(editor.cm, 'file');
         return true;
       },
     });
@@ -31,54 +47,42 @@ export default class PlumbPlugin extends Plugin {
       icon: 'text-selection',
       editorCheckCallback: (checking, editor, ctx) => {
         if (checking) return ctx.file?.extension === 'md';
-        this.formatEditor(editor, 'selection');
+        this.formatEditor(editor.cm, 'selection');
         return true;
       },
     });
 
-    const saveFileCommand = this.app.commands.commands['editor:save-file'];
-    this.originalSaveCallback = saveFileCommand.checkCallback;
-    if (this.originalSaveCallback) {
-      saveFileCommand.checkCallback = (checking) => {
-        const result = this.originalSaveCallback!(checking);
+    const onSaveFile = () => {
+      if (!this.settings.formatOnSave) return false;
+      const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+      if (!editor) return false;
+      this.formatEditor(editor.cm, 'file');
+      return true;
+    };
 
-        if (checking) return result;
-
-        if (!this.settings.formatOnSave) return false;
-
-        const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-        if (!editor) return false;
-        this.formatEditor(editor, 'file');
-        return true;
-      };
-    }
-
-    this.app.workspace.onLayoutReady(async () => {
-      const wasmPath = normalizePath(`${this.manifest.dir!}/dprint_plugin_markdown.wasm`);
-      const buffer = await this.app.vault.adapter.readBinary(wasmPath);
-      this.formatter = createFromBuffer(buffer);
+    this.uninstallCheckCallback = around(this.app.commands.commands['editor:save-file'], {
+      checkCallback(oldCheckCallback) {
+        if (!oldCheckCallback) return () => {};
+        return function (this: Command, ...args: Parameters<typeof oldCheckCallback>) {
+          const result = oldCheckCallback?.apply(this, args);
+          const checking = args[0];
+          if (checking) return result;
+          return onSaveFile();
+        };
+      },
     });
   }
 
-  onunload(): void {
-    const saveFileCommand = this.app.commands.commands['editor:save-file'];
-    if (saveFileCommand.checkCallback && this.originalSaveCallback) {
-      saveFileCommand.checkCallback = this.originalSaveCallback;
-    }
-  }
-
-  private formatEditor(editor: Editor, mode: 'file' | 'selection'): void {
+  private formatEditor(view: EditorView, mode: 'file' | 'selection'): void {
     if (!this.formatter) {
       new Notice('Formatter is unavailable');
       return;
     }
 
-    const cm = editor.cm;
+    const sel = view.state.selection.main;
+    const [from, to] = mode === 'file' ? [0, view.state.doc.length] : [sel.from, sel.to];
 
-    const sel = cm.state.selection.main;
-    const [from, to] = mode === 'file' ? [0, cm.state.doc.length] : [sel.from, sel.to];
-
-    const source = cm.state.doc.sliceString(from, to);
+    const source = view.state.doc.sliceString(from, to);
 
     const durationStart = performance.now();
 
@@ -97,7 +101,7 @@ export default class PlumbPlugin extends Plugin {
 
     const duration = performance.now() - durationStart;
 
-    cm.dispatch({
+    view.dispatch({
       changes: diffResult.changes,
       annotations: isolateHistory.of('full'),
       scrollIntoView: true,
