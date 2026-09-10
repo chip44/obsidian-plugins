@@ -4,12 +4,18 @@ import path from 'node:path';
 import process from 'node:process';
 
 import dprintMd from '@dprint/markdown';
-import { defineConfig, loadEnv, type Plugin, type UserConfig } from 'vite';
+import { defineConfig, loadEnv, type PluginOption, type UserConfig } from 'vite';
 
-function bundleFilePlugin(filePath: string, outputFileName?: string): Plugin {
-  filePath = path.resolve(filePath);
+/* oxlint-disable obsidianmd/hardcoded-config-path */
+
+function bundleFilePlugin(filePath: string, outputFileName?: string): PluginOption {
+  filePath = path.resolve(import.meta.dirname, filePath);
+  if (!fs.existsSync(filePath)) return undefined;
   return {
     name: 'bundle-file',
+    buildStart() {
+      this.addWatchFile(filePath);
+    },
     generateBundle() {
       this.emitFile({
         type: 'asset',
@@ -21,14 +27,14 @@ function bundleFilePlugin(filePath: string, outputFileName?: string): Plugin {
   };
 }
 
-function copyToVaultPlugin(): Plugin {
+function copyToVaultPlugin(): PluginOption {
   return {
     name: 'copy-to-vault',
     async writeBundle(_, bundle) {
       const VAULT = process.env.VAULT;
       if (!VAULT) return;
 
-      const outDir = path.resolve(this.environment.config.build.outDir);
+      const outDir = path.resolve(import.meta.dirname, this.environment.config.build.outDir);
 
       const obsidianPluginsDir = path.join(VAULT, '.obsidian/plugins');
       if (!(await fs.promises.stat(obsidianPluginsDir)).isDirectory())
@@ -72,7 +78,7 @@ export default defineConfig(({ mode }) => {
         formats: ['cjs'],
         fileName: () => 'main.js',
       },
-      outDir: pluginDir,
+      outDir: `dist/${PLUGIN}`,
       emptyOutDir: false,
       minify: prod ? 'oxc' : false,
       sourcemap: prod ? false : 'inline',
@@ -102,7 +108,11 @@ export default defineConfig(({ mode }) => {
         '@shared': path.resolve(import.meta.dirname, 'shared/src'),
       },
     },
-    plugins: [bundleFilePlugin(`${pluginDir}/manifest.json`), copyToVaultPlugin()],
+    plugins: [
+      bundleFilePlugin(`${pluginDir}/manifest.json`),
+      bundleFilePlugin(`${pluginDir}/styles.css`),
+      copyToVaultPlugin(),
+    ],
   };
 
   // plugin-specific configuration
