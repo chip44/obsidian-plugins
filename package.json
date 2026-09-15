@@ -1,10 +1,10 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "vite build --watch --mode=development",
-    "dev:all": "MODE=development node scripts/build-all.ts",
+    "dev": "NODE_ENV=development vite build --watch --mode=development",
+    "dev:all": "NODE_ENV=development node scripts/build-all.ts",
     "build": "vite build",
-    "build:all": "MODE=production node scripts/build-all.ts",
+    "build:all": "node scripts/build-all.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",

@@ -9,7 +9,7 @@ const plugins = (await fs.readdir(pluginsDir, { withFileTypes: true }))
   .filter((d) => d.isDirectory())
   .map((d) => d.name);
 
-const mode = process.env.MODE ?? 'development';
+const mode = process.env.NODE_ENV ?? 'development';
 const prod = mode === 'production';
 
 for (const plugin of plugins) {
