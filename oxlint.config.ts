@@ -13,6 +13,7 @@ export default defineConfig({
     pedantic: 'warn',
     perf: 'warn',
   },
+  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'import'],
   jsPlugins: ['eslint-plugin-obsidianmd'],
   rules: {
     ...obsidianmd.ruleConfigs.recommended,
@@ -24,5 +25,5 @@ export default defineConfig({
     'typescript/strict-boolean-expressions': 'off',
     'obsidianmd/ui/sentence-case': ['warn', { brands: ['Keystone', 'Latex Suite'] }],
   },
-  ignorePatterns: ['scripts/**', 'plugins/**/main.js'],
+  ignorePatterns: ['dist/**', 'scripts/**'],
 });

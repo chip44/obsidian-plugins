@@ -1,16 +1,35 @@
 diff --git a/dist/lib/index.js b/dist/lib/index.js
-index 70d3da1b99ec5f9125376fb498df8bb972c74a46..8e863093d96e2f80a5178205ab83b87b26a931a1 100644
+index 70d3da1b99ec5f9125376fb498df8bb972c74a46..60f2745f3efbbe23d50890b95c9e0bd64364b2d6 100644
 --- a/dist/lib/index.js
 +++ b/dist/lib/index.js
-@@ -32,7 +32,6 @@ import { ui } from "./rules/ui/index.js";
+@@ -30,11 +30,8 @@ import noUnsupportedApi from "./rules/noUnsupportedApi.js";
+ import { getManifest } from "./manifest.js";
+ import { ui } from "./rules/ui/index.js";
  // --- Import plugins and configs for the recommended config ---
- import js from "@eslint/js";
+-import js from "@eslint/js";
  import json from "@eslint/json";
 -import tseslint from "typescript-eslint";
  import sdl from "@microsoft/eslint-plugin-sdl";
- import * as importPlugin from "eslint-plugin-import";
+-import * as importPlugin from "eslint-plugin-import";
  import depend from 'eslint-plugin-depend';
-@@ -229,7 +228,7 @@ const flatRecommendedConfig = defineConfig([
+ import globals from "globals";
+ import fs from "node:fs";
+@@ -214,7 +211,6 @@ const flatRecommendedGeneralRules = {
+     "no-unsanitized/property": "error",
+ };
+ const flatRecommendedConfig = defineConfig([
+-    js.configs.recommended,
+     {
+         plugins: {
+             obsidianmd: plugin
+@@ -222,14 +218,13 @@ const flatRecommendedConfig = defineConfig([
+     },
+     {
+         plugins: {
+-            import: importPlugin,
+             "@microsoft/sdl": sdl,
+             depend,
+             noUnsanitizedPlugin,
              "eslint-comments": eslintComments,
          },
          files: ['**/*.{js,cjs,mjs,jsx}'],
@@ -19,7 +38,14 @@ index 70d3da1b99ec5f9125376fb498df8bb972c74a46..8e863093d96e2f80a5178205ab83b87b
          rules: {
              ...flatRecommendedGeneralRules,
              ...recommendedPluginRulesConfigBase
-@@ -244,7 +243,7 @@ const flatRecommendedConfig = defineConfig([
+@@ -237,14 +232,13 @@ const flatRecommendedConfig = defineConfig([
+     },
+     {
+         plugins: {
+-            import: importPlugin,
+             "@microsoft/sdl": sdl,
+             depend,
+             noUnsanitizedPlugin,
              "eslint-comments": eslintComments,
          },
          files: ['**/*.{ts,cts,mts,tsx}'],
@@ -28,7 +54,7 @@ index 70d3da1b99ec5f9125376fb498df8bb972c74a46..8e863093d96e2f80a5178205ab83b87b
          rules: {
              ...flatRecommendedGeneralRules,
              ...recommendedPluginRulesConfig
-@@ -253,7 +252,7 @@ const flatRecommendedConfig = defineConfig([
+@@ -253,7 +247,7 @@ const flatRecommendedConfig = defineConfig([
      {
          files: ['package.json'],
          language: 'json/json',
