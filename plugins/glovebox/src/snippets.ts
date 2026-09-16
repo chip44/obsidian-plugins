@@ -37,9 +37,13 @@ export const snippetTrigger = EditorState.transactionFilter.of((tr) => {
 
   // check all triggers, longest match wins
   let matched: string | undefined;
-  for (const snippet of enabledSnippets) {
-    if (text.endsWith(snippet.trigger) && (!matched || snippet.trigger.length > matched.length)) {
-      matched = snippet.trigger;
+  for (const { trigger } of enabledSnippets) {
+    if (
+      trigger.length > (matched?.length ?? 0) &&
+      text.endsWith(trigger) &&
+      !text.endsWith(`\\${trigger}`)
+    ) {
+      matched = trigger;
     }
   }
   if (!matched) return tr;
