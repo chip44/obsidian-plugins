@@ -66,7 +66,7 @@ export class GloveboxPluginSettingTab extends PluginSettingTab {
           });
           el.appendText('.');
         }),
-        displayValue: `${this.plugin.settings.snippets.length} snippet${this.plugin.settings.snippets.length > 1 ? 's' : ''}`,
+        displayValue: `${this.plugin.settings.snippets.length} snippet${this.plugin.settings.snippets.length === 1 ? '' : 's'}`,
         items: [
           {
             type: 'list',
