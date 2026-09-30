@@ -9,7 +9,8 @@ const plugins = (await fs.readdir(pluginsDir, { withFileTypes: true }))
   .filter((d) => d.isDirectory())
   .map((d) => d.name);
 
-const mode = process.env.NODE_ENV ?? 'development';
+// `vite build` defaults to NODE_ENV=production (see: https://vite.dev/guide/env-and-mode#node-env-and-modes)
+const mode = process.env.NODE_ENV ?? 'production';
 const prod = mode === 'production';
 
 for (const plugin of plugins) {
