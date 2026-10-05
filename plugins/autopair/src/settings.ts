@@ -30,6 +30,7 @@ export class AutopairPluginSettingTab extends PluginSettingTab {
         control: {
           type: 'text',
           key: 'brackets',
+          defaultValue: DEFAULT_CONFIG.brackets,
           placeholder: DEFAULT_CONFIG.brackets,
           validate: (value: string) =>
             !value.trim() ||
@@ -47,6 +48,7 @@ export class AutopairPluginSettingTab extends PluginSettingTab {
         control: {
           type: 'text',
           key: 'before',
+          defaultValue: DEFAULT_CONFIG.before,
           placeholder: DEFAULT_CONFIG.before,
           validate: (value: string) =>
             !value.trim() || /^\S(?:\s+\S)*$/iu.test(value.trim())
