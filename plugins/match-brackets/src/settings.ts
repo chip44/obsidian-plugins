@@ -12,7 +12,7 @@ export const DEFAULT_CONFIG: PluginConfig = {
   maxScanDistance: 10_000,
 };
 
-export class MyPluginSettingTab extends PluginSettingTab {
+export class MatchBracketsPluginSettingTab extends PluginSettingTab {
   readonly plugin: MatchBracketsPlugin;
   public icon = 'parentheses';
 
@@ -29,9 +29,10 @@ export class MyPluginSettingTab extends PluginSettingTab {
         control: {
           type: 'text',
           key: 'brackets',
+          defaultValue: DEFAULT_CONFIG.brackets,
           placeholder: DEFAULT_CONFIG.brackets,
           validate: (value: string) =>
-            !value.trim ||
+            !value.trim() ||
             value
               .trim()
               .split(/\s+/u)

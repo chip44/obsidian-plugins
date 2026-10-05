@@ -3,7 +3,7 @@ import { type Extension } from '@codemirror/state';
 import { cleanStrings } from '@shared/utils';
 import { Plugin } from 'obsidian';
 
-import { DEFAULT_CONFIG, MyPluginSettingTab, type PluginConfig } from './settings';
+import { DEFAULT_CONFIG, MatchBracketsPluginSettingTab, type PluginConfig } from './settings';
 
 export default class MatchBracketsPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
@@ -11,7 +11,7 @@ export default class MatchBracketsPlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings();
-    this.addSettingTab(new MyPluginSettingTab(this));
+    this.addSettingTab(new MatchBracketsPluginSettingTab(this));
 
     this.app.workspace.onLayoutReady(() => {
       this.setEditorExtensions();
