@@ -1,7 +1,7 @@
 import { isolateHistory } from '@codemirror/commands';
 import type { EditorView } from '@codemirror/view';
 import { createFromBuffer, type Formatter } from '@dprint/formatter';
-import { noop, type Uninstaller } from '@shared/utils';
+import { noop } from '@shared/utils';
 import { around } from 'monkey-around';
 import { MarkdownView, normalizePath, Plugin, type Command } from 'obsidian';
 
@@ -11,7 +11,6 @@ import { DEFAULT_CONFIG, PlumbPluginSettingTab, type PluginConfig } from './sett
 export default class PlumbPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
   private formatter?: Formatter;
-  private uninstallCheckCallback: Uninstaller = noop;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -24,10 +23,6 @@ export default class PlumbPlugin extends Plugin {
       const buffer = await this.app.vault.adapter.readBinary(wasmPath);
       this.formatter = createFromBuffer(buffer);
     });
-  }
-
-  onunload(): void {
-    this.uninstallCheckCallback();
   }
 
   private addCommands(): void {
@@ -61,17 +56,19 @@ export default class PlumbPlugin extends Plugin {
       return true;
     };
 
-    this.uninstallCheckCallback = around(this.app.commands.commands['editor:save-file'], {
-      checkCallback(oldCheckCallback) {
-        if (!oldCheckCallback) return noop;
-        return function (this: Command, ...args: Parameters<typeof oldCheckCallback>) {
-          const result = oldCheckCallback?.apply(this, args);
-          const checking = args[0];
-          if (checking) return result;
-          return onSaveFile();
-        };
-      },
-    });
+    this.register(
+      around(this.app.commands.commands['editor:save-file'], {
+        checkCallback(oldCheckCallback) {
+          if (!oldCheckCallback) return noop;
+          return function (this: Command, ...args: Parameters<typeof oldCheckCallback>) {
+            const result = oldCheckCallback?.apply(this, args);
+            const checking = args[0];
+            if (checking) return result;
+            return onSaveFile();
+          };
+        },
+      }),
+    );
   }
 
   private formatEditor(view: EditorView, mode: 'file' | 'selection'): void {

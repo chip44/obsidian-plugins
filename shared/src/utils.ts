@@ -1,11 +1,4 @@
-import type { around } from 'monkey-around';
-
 export const noop = () => {};
-
-/**
- * a function that can be called to disable or remove all of the wrappers created by `around()`
- */
-export type Uninstaller = ReturnType<typeof around>;
 
 /**
  * trim all strings, remove empty strings, and remove duplicates

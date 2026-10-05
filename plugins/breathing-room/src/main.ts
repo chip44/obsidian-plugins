@@ -1,4 +1,3 @@
-import { noop, type Uninstaller } from '@shared/utils';
 import { around } from 'monkey-around';
 import { Plugin } from 'obsidian';
 
@@ -19,8 +18,6 @@ const MATH_END2_NEW_NO_BACKSLASH = new RegExp(String.raw`\$(.|$)`);
 
 export default class BreathingRoomPlugin extends Plugin {
   settings: PluginConfig = DEFAULT_CONFIG;
-  private uninstallStringStreamMatch: Uninstaller = noop;
-  private uninstallStringMatch: Uninstaller = noop;
 
   // oxlint-disable-next-line max-lines-per-function
   async onload(): Promise<void> {
@@ -45,25 +42,26 @@ export default class BreathingRoomPlugin extends Plugin {
     // the hypermd token function calls t.match() via CM5's StringStream (why does Obsidian still use CM5? idk).
     // we can't patch the mode directly (it's a closure on an internal CM5 instance, window.CodeMirrorAdapter, separate
     // from the public window.CodeMirror), so we intercept here instead.
-    this.uninstallStringStreamMatch = around(CodeMirrorAdapter.StringStream.prototype, {
-      match(oldMatch) {
-        return function (
-          this: InstanceType<typeof CodeMirrorAdapter.StringStream>,
-          ...args: Parameters<typeof oldMatch>
-        ) {
-          const pattern = args[0];
-          if (pattern instanceof RegExp) {
-            args[0] = handleMathRegex(pattern);
-          }
-          return oldMatch.apply(this, args);
-        } as typeof oldMatch;
-      },
-    });
+    this.register(
+      around(CodeMirrorAdapter.StringStream.prototype, {
+        match(oldMatch) {
+          return function (
+            this: InstanceType<typeof CodeMirrorAdapter.StringStream>,
+            ...args: Parameters<typeof oldMatch>
+          ) {
+            const pattern = args[0];
+            if (pattern instanceof RegExp) {
+              args[0] = handleMathRegex(pattern);
+            }
+            return oldMatch.apply(this, args);
+          } as typeof oldMatch;
+        },
+      }),
+    );
 
     // the closing delimiter check uses String.prototype.match directly on a raw line slice, so it needs a separate intercept.
-    this.uninstallStringMatch = around(
-      String.prototype as { match: typeof String.prototype.match },
-      {
+    this.register(
+      around(String.prototype as { match: typeof String.prototype.match }, {
         match(oldMatch) {
           return function (
             this: InstanceType<typeof String>,
@@ -76,13 +74,8 @@ export default class BreathingRoomPlugin extends Plugin {
             return oldMatch.apply(this, args);
           } as typeof oldMatch;
         },
-      },
+      }),
     );
-  }
-
-  onunload(): void {
-    this.uninstallStringMatch();
-    this.uninstallStringStreamMatch();
   }
 
   async loadSettings(): Promise<void> {
