@@ -21,3 +21,18 @@ export function capitalize(str: string): string {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+/**
+ * return a random integer between `min` and `max` (inclusive)
+ *
+ * source: underscore.js (https://github.com/jashkenas/underscore/blob/master/modules/random.js)
+ */
+export function random(max: number): number;
+export function random(min: number, max: number): number;
+export function random(min: number, max?: number): number {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return min + Math.floor(Math.random() * (max - min + 1));
+}

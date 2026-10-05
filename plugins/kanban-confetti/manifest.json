@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-kanban-confetti",
+  "name": "Kanban Confetti",
+  "version": "1.0.0",
+  "minAppVersion": "1.14.0",
+  "description": "Confetti animation for Kanban view.",
+  "author": "chip44",
+  "authorUrl": "https://github.com/chip44",
+  "isDesktopOnly": false
+}

@@ -38,6 +38,10 @@ Automatically expand snippets while typing.
 
 The plugin uses [CodeMirror](https://codemirror.net/)'s native snippets feature and exposes the configuration.
 
+### Kanban Confetti
+
+An extension to [Bases' Kanban view](https://obsidian.md/help/bases/views/kanban) that adds a confetti animation to matching columns, similar to the confetti celebrations in [Trello](https://trello.com/en/guide/enterprise/personality#confetti-celebrations).
+
 ### Keystone
 
 Force QWERTY layout inside math and code blocks, regardless of system layout.
