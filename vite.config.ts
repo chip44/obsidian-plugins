@@ -16,12 +16,12 @@ function bundleFilePlugin(filePath: string, outputFileName?: string): PluginOpti
     buildStart() {
       this.addWatchFile(filePath);
     },
-    generateBundle() {
+    async generateBundle() {
       this.emitFile({
         type: 'asset',
         fileName: outputFileName ?? path.basename(filePath),
         originalFileName: filePath,
-        source: fs.readFileSync(filePath),
+        source: await fs.promises.readFile(filePath),
       });
     },
   };
@@ -37,8 +37,9 @@ function copyToVaultPlugin(): PluginOption {
       const outDir = path.resolve(import.meta.dirname, this.environment.config.build.outDir);
 
       const obsidianPluginsDir = path.join(VAULT, '.obsidian/plugins');
-      if (!(await fs.promises.stat(obsidianPluginsDir)).isDirectory())
+      if (!(await fs.promises.stat(obsidianPluginsDir)).isDirectory()) {
         throw new Error("VAULT is invalid or missing '.obsidian/plugins' directory");
+      }
 
       const manifest = `${outDir}/manifest.json`;
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion typescript/no-unsafe-member-access
@@ -61,13 +62,18 @@ function copyToVaultPlugin(): PluginOption {
 }
 
 // oxlint-disable-next-line max-lines-per-function
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd(), '') };
 
   const PLUGIN = process.env.PLUGIN;
-  if (!PLUGIN) throw new Error('PLUGIN is required');
+  if (!PLUGIN) throw new Error('PLUGIN env is required');
 
   const pluginDir = `plugins/${PLUGIN}`;
+  if (!fs.existsSync(pluginDir)) {
+    const entries = await fs.promises.readdir('plugins', { withFileTypes: true });
+    const plugins = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+    throw new Error(`invalid PLUGIN env. available values: ${plugins.join(', ')}`);
+  }
 
   const prod = mode === 'production';
 
